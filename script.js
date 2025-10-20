@@ -1,22 +1,23 @@
 'use strict';
 
 // === CONFIG ===
-// All JSON files to load and merge (URL-encoded spaces)
-const JSON_PATHS = [
-  "Opinion%20and%20argument.json",
-  "Doubt,%20guessing%20and%20certainty.json",
-  "Discussion%20and%20agreement.json"
+// Identify each file with a friendly topic name so we can filter by it
+const SOURCES = [
+  { path: "Opinion%20and%20argument.json", topic: "Opinion & Argument" },
+  { path: "Doubt,%20guessing%20and%20certainty.json", topic: "Doubt, guessing and certainty" },
+  { path: "Discussion%20and%20agreement.json", topic: "Discussion and agreement" },
 ];
 const LEVELS = ["A1","A2","B1","B2","C1","C2"];
 
-// Optional: quick custom definitions (left empty since we're skipping definitions)
-const definitionsOverride = {};
+const definitionsOverride = {}; // keeping for future use
 
 let DATA = [];
 const list = document.getElementById('list');
 const btn = document.getElementById('btn');
 const levelSlider = document.getElementById('level');
 const themeBtn = document.getElementById('themeToggle');
+const topicSelect = document.getElementById('topic');
+const levelTick = document.getElementById('levelTick');
 
 // ---- Theme handling ----
 function applyTheme(theme) {
@@ -33,27 +34,39 @@ themeBtn?.addEventListener('click', () => {
   applyTheme(current === 'dark' ? 'light' : 'dark');
 });
 
+// ---- Slider tick alignment ----
+function updateTick(){
+  const min = Number(levelSlider.min), max = Number(levelSlider.max);
+  const val = Number(levelSlider.value);
+  const pct = (val - min) / (max - min); // 0..1
+  levelTick.style.left = `${pct * 100}%`;
+}
+levelSlider.addEventListener('input', updateTick);
+window.addEventListener('resize', updateTick);
+updateTick();
+
 // ---- Data + render ----
 async function loadJSON() {
   if (DATA.length) return DATA;
-  const results = await Promise.all(JSON_PATHS.map(async (p) => {
+  const results = await Promise.all(SOURCES.map(async ({path, topic}) => {
     try {
-      const res = await fetch(p, { cache: 'no-store' });
+      const res = await fetch(path, { cache: 'no-store' });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
-      if (!Array.isArray(json)) throw new Error(`Expected an array in ${p}`);
-      return json;
+      if (!Array.isArray(json)) throw new Error(`Expected an array in ${path}`);
+      // annotate with topic
+      return json.map(x => ({...x, __topic: topic}));
     } catch (err) {
-      console.error('Failed to load', p, err);
+      console.error('Failed to load', path, err);
       return [];
     }
   }));
-  // Merge and de-duplicate by term|type|level (case-insensitive)
+  // Merge and de-duplicate by term|type|level|topic (topic included so the same term can appear in multiple topics separately)
   const merged = results.flat();
   const map = new Map();
   for (const item of merged) {
     if (!item || !item.term) continue;
-    const key = [item.term, item.type || '', item.level || ''].join('|').toLowerCase();
+    const key = [item.term, item.type || '', item.level || '', item.__topic || ''].join('|').toLowerCase();
     if (!map.has(key)) map.set(key, item);
   }
   DATA = Array.from(map.values());
@@ -98,6 +111,12 @@ function render(items) {
       b2.textContent = item.level;
       badges.appendChild(b2);
     }
+    if (item.__topic) {
+      const b3 = document.createElement('span');
+      b3.className = 'badge';
+      b3.textContent = item.__topic;
+      badges.appendChild(b3);
+    }
     title.appendChild(badges);
     card.appendChild(title);
 
@@ -107,7 +126,7 @@ function render(items) {
     if (existing) {
       def.textContent = existing;
     } else {
-      def.innerHTML = `<span class="no-def">No definition provided.</span>`;
+      def.innerHTML = `<span class="no-def">No definition provided in JSON.</span>`;
       const more = document.createElement('div');
       more.className = 'more';
       more.innerHTML = `Look it up: <a target="_blank" rel="noopener" href="${dictionaryUrl(item.term)}">${item.term}</a>`;
@@ -124,16 +143,25 @@ function currentLevel() {
   return LEVELS[idx];
 }
 
+function currentTopic() {
+  return topicSelect?.value || 'all';
+}
+
 async function generate() {
   list.setAttribute('aria-busy', 'true');
   await loadJSON();
   if (!DATA.length) { list.removeAttribute('aria-busy'); return; }
-  const selected = currentLevel();
-  let pool = DATA.filter(x => String(x.level || '').toUpperCase() === selected);
+  const selectedLevel = currentLevel();
+  const selectedTopic = currentTopic();
+  let pool = DATA.filter(x => String(x.level || '').toUpperCase() === selectedLevel);
+  if (selectedTopic !== 'all') {
+    pool = pool.filter(x => x.__topic === selectedTopic);
+  }
   const five = sampleUnique(pool, Math.min(5, pool.length || 0));
   if (five.length === 0) {
-    pool = DATA;
-    render(sampleUnique(pool, Math.min(5, pool.length)));
+    // graceful fallback: ignore level filter if it's empty for this topic
+    const alt = DATA.filter(x => selectedTopic === 'all' ? true : x.__topic === selectedTopic);
+    render(sampleUnique(alt, Math.min(5, alt.length)));
   } else {
     render(five);
   }

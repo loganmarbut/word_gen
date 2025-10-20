@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Opinion & Argument • 5-word Generator</title>
-  <link rel="stylesheet" href="styles.css?v=3">
+  <title>Word Generator</title>
+  <link rel="stylesheet" href="styles.css?v=4">
 </head>
 <body>
   <div class="wrap">
@@ -13,14 +13,23 @@
         <input type="range" id="level" min="0" max="5" step="1" value="0" aria-label="Select CEFR level A1 to C2">
         <div class="marks" aria-hidden="true">
           <span>A1</span><span>A2</span><span>B1</span><span>B2</span><span>C1</span><span>C2</span>
+          <div id="levelTick" class="tick" aria-hidden="true"></div>
         </div>
       </div>
+
+      <select id="topic" class="select" aria-label="Choose topic">
+        <option value="all">All topics</option>
+        <option value="Opinion & Argument">Opinion & Argument</option>
+        <option value="Doubt, guessing and certainty">Doubt, guessing and certainty</option>
+        <option value="Discussion and agreement">Discussion and agreement</option>
+      </select>
+
       <button id="btn" class="btn">⚡ Generate</button>
       <button id="themeToggle" class="btn" aria-label="Toggle light/dark theme">☀️ Light</button>
     </div>
 
     <div id="list" class="list" aria-live="polite" aria-busy="false"></div>
   </div>
-  <script src="script.js"></script>
+  <script src="script.js?v=4"></script>
 </body>
 </html>
