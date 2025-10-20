@@ -1,7 +1,13 @@
 'use strict';
 
 // === CONFIG ===
-const JSON_PATH = "Opinion%20and%20argument.json"; // same folder as index.html
+// Put both JSON file paths here (URL-encoded if they contain spaces/commas).
+// Files should sit in the same folder as index.html.
+const JSON_PATHS = [
+  "Opinion%20and%20argument.json",
+  "Doubt,%20guessing%20and%20certainty.json"
+];
+
 const LEVELS = ["A1","A2","B1","B2","C1","C2"];
 
 // Optional: map overrides for definitions if your JSON doesn't include them yet.
@@ -23,7 +29,7 @@ function applyTheme(theme) {
   const saved = localStorage.getItem('theme') || 'dark';
   applyTheme(saved);
 })();
-themeBtn.addEventListener('click', () => {
+themeBtn?.addEventListener('click', () => {
   const current = document.documentElement.getAttribute('data-theme') || 'dark';
   applyTheme(current === 'dark' ? 'light' : 'dark');
 });
@@ -31,15 +37,27 @@ themeBtn.addEventListener('click', () => {
 // ---- Data + render ----
 async function loadJSON() {
   if (DATA.length) return DATA;
-  try {
-    const res = await fetch(JSON_PATH, { cache: 'no-store' });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const json = await res.json();
-    if (!Array.isArray(json)) throw new Error('Expected an array of entries in the JSON file.');
-    DATA = json;
-  } catch (err) {
-    console.error('Failed to load JSON:', err);
+  const results = await Promise.all(JSON_PATHS.map(async (p) => {
+    try {
+      const res = await fetch(p, { cache: 'no-store' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      if (!Array.isArray(json)) throw new Error(`Expected an array in ${p}`);
+      return json;
+    } catch (err) {
+      console.error('Failed to load', p, err);
+      return [];
+    }
+  }));
+  // Merge and de-duplicate by term|type|level (case-insensitive)
+  const merged = results.flat();
+  const map = new Map();
+  for (const item of merged) {
+    if (!item || !item.term) continue;
+    const key = [item.term, item.type || '', item.level || ''].join('|').toLowerCase();
+    if (!map.has(key)) map.set(key, item);
   }
+  DATA = Array.from(map.values());
   return DATA;
 }
 
@@ -116,9 +134,7 @@ async function generate() {
   if (!DATA.length) { list.removeAttribute('aria-busy'); return; }
   const selected = currentLevel();
   let pool = DATA.filter(x => String(x.level || '').toUpperCase() === selected);
-  // If not enough items at this level, just use whatever exists at that level (could be <5)
   const five = sampleUnique(pool, Math.min(5, pool.length || 0));
-  // If none at the selected level, fall back to all
   if (five.length === 0) {
     pool = DATA;
     render(sampleUnique(pool, Math.min(5, pool.length)));
