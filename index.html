@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -8,15 +8,18 @@
 </head>
 <body>
   <div class="wrap">
-    <header>
-      <h1>Random 5 from <em>Opinion &amp; Argument</em></h1>
-      <div class="controls">
-        <button id="btn">⚡ Generate</button>
+    <div class="controls">
+      <div class="level-picker">
+        <input type="range" id="level" min="0" max="5" step="1" value="0" aria-label="Select CEFR level A1 to C2">
+        <div class="marks" aria-hidden="true">
+          <span>A1</span><span>A2</span><span>B1</span><span>B2</span><span>C1</span><span>C2</span>
+        </div>
       </div>
-    </header>
-    <p class="hint">Click <strong>Generate</strong> to pick five unique terms from your JSON and show their definitions (if present). If a definition is missing, you'll still see the term with its type/level and a quick dictionary link.</p>
+      <button id="btn" class="btn">⚡ Generate</button>
+      <button id="themeToggle" class="btn" aria-label="Toggle light/dark theme">☀️ Light</button>
+    </div>
+
     <div id="list" class="list" aria-live="polite" aria-busy="false"></div>
-    <div id="footer" class="footer"></div>
   </div>
   <script src="script.js"></script>
 </body>
