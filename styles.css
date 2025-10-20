@@ -41,144 +41,24 @@ body {
 }
 .level-picker { flex: 1 1 560px; min-width: 300px; padding: 0 calc(var(--thumb) / 2); display: flex; flex-direction: column; gap: 6px; }
 .dropdown    { flex: 0 1 260px; min-width: 180px; }
-.btn         { flex: 0 0 auto; }
-
-/* --- Level slider --- */
-.level-picker input[type="range"] {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 100%;
-  height: var(--thumb);
-  background: transparent;
-  margin: 0;
-  cursor: pointer;
-  --fill: 0%;
-}
-.level-picker input[type="range"]::-webkit-slider-runnable-track {
-  height: var(--track-h);
-  border-radius: 999px;
-  background: linear-gradient(to right,
-              var(--accent-soft) 0%,
-              var(--accent-soft) var(--fill),
-              var(--card) var(--fill),
-              var(--card) 100%);
-  box-shadow: 0 0 0 1px var(--ring) inset;
-}
-.level-picker input[type="range"]::-moz-range-track {
-  height: var(--track-h);
-  border-radius: 999px;
-  background: linear-gradient(to right,
-              var(--accent-soft) 0%,
-              var(--accent-soft) var(--fill),
-              var(--card) var(--fill),
-              var(--card) 100%);
-  box-shadow: 0 0 0 1px var(--ring) inset;
-}
-.level-picker input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: var(--thumb); height: var(--thumb);
-  border-radius: 50%;
-  background: var(--accent);
-  border: 0;
-  box-shadow: 0 3px 10px rgba(0,0,0,.25);
-  margin-top: calc((var(--track-h) - var(--thumb)) / 2);
-}
-.level-picker input[type="range"]::-moz-range-thumb {
-  width: var(--thumb); height: var(--thumb);
-  border-radius: 50%;
-  background: var(--accent);
-  border: 0;
-  box-shadow: 0 3px 10px rgba(0,0,0,.25);
-}
-.level-picker .marks {
-  position: relative;
-  height: 1.1rem;
-  width: 100%;
-  user-select: none;
-  color: var(--muted);
-  font-size: .8rem;
-}
-.level-picker .marks span {
-  position: absolute;
-  top: 0;
-  transform: translateX(-50%);
-  text-align: center;
-  min-width: 2ch;
-}
-.level-picker .marks span:nth-child(1) { left: 0%;   transform: translateX(0); }
-.level-picker .marks span:nth-child(2) { left: 20%; }
-.level-picker .marks span:nth-child(3) { left: 40%; }
-.level-picker .marks span:nth-child(4) { left: 60%; }
-.level-picker .marks span:nth-child(5) { left: 80%; }
-.level-picker .marks span:nth-child(6) { left: 100%; transform: translateX(-100%); }
-
-/* --- Custom dropdown --- */
-.dropdown { position: relative; }
-.dd-trigger {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  border: 2px solid var(--ring);
-  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.06)), var(--card);
-  color: var(--text);
-  padding: 10px 14px;
-  border-radius: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  line-height: 1.1;
-  box-shadow: 0 6px 18px rgba(0,0,0,.08);
-  width: 100%;
-  max-width: 100%;
-}
-.dd-trigger span {
-  display: inline-block;
-  max-width: calc(100% - 18px); /* leave room for chevron */
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.dd-trigger .chev { flex: 0 0 auto; transition: transform .15s ease; }
-.dropdown.open .chev { transform: rotate(180deg); }
-.dd-menu {
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 0;
-  min-width: 240px;
-  width: max(240px, 100%);
-  border: 2px solid var(--ring);
-  border-radius: 12px;
-  background: var(--card);
-  padding: 6px;
-  box-shadow: 0 20px 40px rgba(0,0,0,.3);
-  display: none;
-  z-index: 20;
-}
-.dropdown.open .dd-menu { display: block; }
-.dd-option {
-  list-style: none;
-  padding: 10px 12px;
-  border-radius: 10px;
-  cursor: pointer;
-  color: var(--text);
-}
-.dd-option:hover { background: color-mix(in oklab, var(--card), var(--accent) 10%); }
-.dd-option[aria-selected="true"] { background: color-mix(in oklab, var(--card), var(--accent) 15%); }
-
-/* --- Buttons --- */
 .btn {
   appearance: none;
-  border: 1px solid var(--ring);
-  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.06)), var(--card);
+  border: 2px solid var(--ring);
+  background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(0,0,0,.06)), var(--card);
   color: var(--text);
-  padding: 10px 14px;
-  border-radius: 12px;
+  padding: 10px 16px;
+  border-radius: 14px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 6px 18px rgba(0,0,0,.08);
-  transition: transform .05s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
+  box-shadow: 0 8px 22px rgba(0,0,0,.10);
+  transition: transform .06s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
 }
-.btn:hover { border-color: color-mix(in oklab, var(--ring), var(--accent)); background: color-mix(in oklab, var(--card) 85%, transparent); }
+.btn:hover { 
+  border-color: color-mix(in oklab, var(--ring), var(--accent) 28%); 
+  background: color-mix(in oklab, var(--card) 92%, white 8%);
+}
 .btn:active { transform: translateY(1px) scale(.99); }
+.btn:focus-visible { outline: none; box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 24%, transparent); }
 
 /* --- Cards --- */
 .list { margin-top: 24px; display: grid; grid-template-columns: 1fr; gap: 14px; }
