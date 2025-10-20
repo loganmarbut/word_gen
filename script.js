@@ -30,7 +30,7 @@ themeBtn?.addEventListener('click', () => {
   applyTheme(current === 'dark' ? 'light' : 'dark');
 });
 
-// ---- Slider fill + alignment ----
+// ---- Slider fill ----
 function updateSliderVisuals(){
   const min = Number(levelSlider.min), max = Number(levelSlider.max);
   const val = Number(levelSlider.value);

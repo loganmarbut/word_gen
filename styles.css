@@ -4,7 +4,7 @@
   --text: #e6e9ef;
   --muted: #98a0b3;
   --accent: #7c9eff;
-  --accent-soft: #9cb3ff; /* used for the filled part of the slider */
+  --accent-soft: #9cb3ff;
   --ring: #2b3553;
   --thumb: 22px;
   --track-h: 8px;
@@ -30,23 +30,20 @@ body {
 
 .wrap { max-width: 980px; margin: 60px auto; padding: 0 20px; }
 
+/* Controls: avoid jumping by letting the dropdown shrink and ellipsize */
 .controls {
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   gap: 14px;
   margin: 10px auto 24px;
   flex-wrap: wrap;
 }
+.level-picker { flex: 1 1 560px; min-width: 300px; padding: 0 calc(var(--thumb) / 2); display: flex; flex-direction: column; gap: 6px; }
+.dropdown    { flex: 0 1 260px; min-width: 180px; }
+.btn         { flex: 0 0 auto; }
 
 /* --- Level slider --- */
-.level-picker {
-  width: min(560px, 90vw);
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 0 calc(var(--thumb) / 2);
-}
 .level-picker input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
@@ -55,10 +52,8 @@ body {
   background: transparent;
   margin: 0;
   cursor: pointer;
-  /* the value (0%..100%) will be written to --fill by JS */
   --fill: 0%;
 }
-/* unified track (webkit + firefox) with subtle filled color */
 .level-picker input[type="range"]::-webkit-slider-runnable-track {
   height: var(--track-h);
   border-radius: 999px;
@@ -79,7 +74,6 @@ body {
               var(--card) 100%);
   box-shadow: 0 0 0 1px var(--ring) inset;
 }
-/* thumbs */
 .level-picker input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   width: var(--thumb); height: var(--thumb);
@@ -133,14 +127,24 @@ body {
   cursor: pointer;
   line-height: 1.1;
   box-shadow: 0 6px 18px rgba(0,0,0,.08);
+  width: 100%;
+  max-width: 100%;
 }
-.dd-trigger .chev { transition: transform .15s ease; }
+.dd-trigger span {
+  display: inline-block;
+  max-width: calc(100% - 18px); /* leave room for chevron */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dd-trigger .chev { flex: 0 0 auto; transition: transform .15s ease; }
 .dropdown.open .chev { transform: rotate(180deg); }
 .dd-menu {
   position: absolute;
   top: calc(100% + 8px);
   left: 0;
   min-width: 240px;
+  width: max(240px, 100%);
   border: 2px solid var(--ring);
   border-radius: 12px;
   background: var(--card);
@@ -159,7 +163,6 @@ body {
 }
 .dd-option:hover { background: color-mix(in oklab, var(--card), var(--accent) 10%); }
 .dd-option[aria-selected="true"] { background: color-mix(in oklab, var(--card), var(--accent) 15%); }
-.dd-option .sub { color: var(--muted); font-weight: 500; margin-left: 6px; }
 
 /* --- Buttons --- */
 .btn {
