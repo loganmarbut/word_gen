@@ -5,9 +5,9 @@
   --muted: #98a0b3;
   --accent: #7c9eff;
   --ring: #2b3553;
-  --thumb: 22px; /* slider thumb size */
+  --thumb: 22px;
+  --track-h: 8px;
 }
-/* Light theme overrides */
 html[data-theme="light"] {
   --bg: #f7f8fb;
   --card: #ffffff;
@@ -42,57 +42,49 @@ body {
   width: min(560px, 90vw);
   display: flex;
   flex-direction: column;
-  align-items: stretch;
   gap: 6px;
-  /* Both slider and marks share the same inner horizontal padding to account for thumb radius */
-  padding: 0 calc(var(--thumb) / 2);
+  padding: 0 calc(var(--thumb) / 2); /* makes labels align with thumb center */
 }
 .level-picker input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
-  height: 10px;
-  border-radius: 999px;
+  height: var(--thumb); /* big enough so thumb never clips */
   background: transparent;
   margin: 0;
+  cursor: pointer;
 }
-/* WebKit track */
+/* unified track (webkit + firefox) */
 .level-picker input[type="range"]::-webkit-slider-runnable-track {
-  height: 10px;
+  height: var(--track-h);
   border-radius: 999px;
-  background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(0,0,0,.06)), var(--card);
-  border: 1px solid var(--ring);
+  background: var(--card);
+  box-shadow: 0 0 0 1px var(--ring) inset;
 }
-/* Firefox track */
 .level-picker input[type="range"]::-moz-range-track {
-  height: 10px;
+  height: var(--track-h);
   border-radius: 999px;
-  background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(0,0,0,.06)), var(--card);
-  border: 1px solid var(--ring);
+  background: var(--card);
+  box-shadow: 0 0 0 1px var(--ring) inset;
 }
-/* WebKit thumb */
+/* thumbs */
 .level-picker input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  appearance: none;
   width: var(--thumb); height: var(--thumb);
   border-radius: 50%;
   background: var(--accent);
   border: 0;
   box-shadow: 0 3px 10px rgba(0,0,0,.25);
-  margin-top: calc((10px - var(--thumb)) / 2); /* centers thumb on track */
-  cursor: pointer;
+  margin-top: calc((var(--track-h) - var(--thumb)) / 2); /* centers thumb vertically */
 }
-/* Firefox thumb */
 .level-picker input[type="range"]::-moz-range-thumb {
   width: var(--thumb); height: var(--thumb);
   border-radius: 50%;
   background: var(--accent);
   border: 0;
   box-shadow: 0 3px 10px rgba(0,0,0,.25);
-  cursor: pointer;
 }
-
-/* Labels exactly at 0/20/40/60/80/100% of the usable width */
+/* Labels at exact percentages of usable width */
 .level-picker .marks {
   position: relative;
   height: 1.1rem;
@@ -114,13 +106,11 @@ body {
 .level-picker .marks span:nth-child(4) { left: 60%; }
 .level-picker .marks span:nth-child(5) { left: 80%; }
 .level-picker .marks span:nth-child(6) { left: 100%; transform: translateX(-100%); }
-
-/* Visual tick that follows the slider value to verify alignment */
+/* Tick under the thumb for debug/assurance */
 .tick {
   position: absolute;
   top: -6px;
-  width: 6px;
-  height: 6px;
+  width: 6px; height: 6px;
   border-radius: 999px;
   background: var(--accent);
   box-shadow: 0 0 0 4px rgba(124,158,255,.18);
@@ -133,7 +123,7 @@ body {
 .btn, .select {
   appearance: none;
   border: 1px solid var(--ring);
-  background: transparent;
+  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.06)), var(--card);
   color: var(--text);
   padding: 10px 14px;
   border-radius: 12px;
@@ -142,7 +132,14 @@ body {
   box-shadow: 0 6px 18px rgba(0,0,0,.08);
   transition: transform .05s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
 }
-.select { padding-right: 36px; }
+.select { 
+  font-weight: 500; 
+  line-height: 1.2;
+  padding-right: 36px; 
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5' stroke='%2398a0b3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); 
+  background-repeat: no-repeat; 
+  background-position: right 10px center; 
+}
 .btn:hover, .select:hover { border-color: color-mix(in oklab, var(--ring), var(--accent)); background: color-mix(in oklab, var(--card) 85%, transparent); }
 .btn:active { transform: translateY(1px) scale(.99); }
 
@@ -158,8 +155,15 @@ body {
 .term { font-size: 1.05rem; font-weight: 700; letter-spacing: .2px; }
 .badges { display: inline-flex; gap: 8px; margin-left: 10px; vertical-align: middle; }
 .badge { font-size: .7rem; color: var(--muted); border: 1px solid var(--ring); padding: 3px 7px; border-radius: 999px; }
-.def { margin: 10px 0 2px; line-height: 1.5; }
-.no-def { color: var(--muted); }
-.more { font-size: .825rem; }
-.more a { color: var(--accent); text-decoration: none; }
-.more a:hover { text-decoration: underline; }
+/* Cleaner hint row */
+.meta {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+  font-size: .82rem;
+  color: var(--muted);
+}
+.meta a { color: var(--muted); text-decoration: none; }
+.meta a:hover { text-decoration: underline; }

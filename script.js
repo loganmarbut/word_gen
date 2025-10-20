@@ -1,7 +1,6 @@
 'use strict';
 
 // === CONFIG ===
-// Identify each file with a friendly topic name so we can filter by it
 const SOURCES = [
   { path: "Opinion%20and%20argument.json", topic: "Opinion & Argument" },
   { path: "Doubt,%20guessing%20and%20certainty.json", topic: "Doubt, guessing and certainty" },
@@ -54,14 +53,12 @@ async function loadJSON() {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
       if (!Array.isArray(json)) throw new Error(`Expected an array in ${path}`);
-      // annotate with topic
       return json.map(x => ({...x, __topic: topic}));
     } catch (err) {
       console.error('Failed to load', path, err);
       return [];
     }
   }));
-  // Merge and de-duplicate by term|type|level|topic (topic included so the same term can appear in multiple topics separately)
   const merged = results.flat();
   const map = new Map();
   for (const item of merged) {
@@ -111,28 +108,23 @@ function render(items) {
       b2.textContent = item.level;
       badges.appendChild(b2);
     }
-    if (item.__topic) {
-      const b3 = document.createElement('span');
-      b3.className = 'badge';
-      b3.textContent = item.__topic;
-      badges.appendChild(b3);
-    }
+    // remove topic badge to reduce clutter
+
     title.appendChild(badges);
     card.appendChild(title);
 
     const existing = (item.definition && String(item.definition).trim()) || definitionsOverride[item.term];
-    const def = document.createElement('div');
-    def.className = 'def';
-    if (existing) {
-      def.textContent = existing;
-    } else {
-      def.innerHTML = `<span class="no-def">No definition provided in JSON.</span>`;
-      const more = document.createElement('div');
-      more.className = 'more';
-      more.innerHTML = `Look it up: <a target="_blank" rel="noopener" href="${dictionaryUrl(item.term)}">${item.term}</a>`;
-      card.appendChild(more);
-    }
-    card.appendChild(def);
+
+    // Cleaner, minimal meta row instead of the bulky message
+    const meta = document.createElement('div');
+    meta.className = 'meta';
+    const link = document.createElement('a');
+    link.href = dictionaryUrl(item.term);
+    link.target = "_blank";
+    link.rel = "noopener";
+    link.textContent = "dictionary ↗";
+    meta.appendChild(link);
+    card.appendChild(meta);
 
     list.appendChild(card);
   }
@@ -159,7 +151,6 @@ async function generate() {
   }
   const five = sampleUnique(pool, Math.min(5, pool.length || 0));
   if (five.length === 0) {
-    // graceful fallback: ignore level filter if it's empty for this topic
     const alt = DATA.filter(x => selectedTopic === 'all' ? true : x.__topic === selectedTopic);
     render(sampleUnique(alt, Math.min(5, alt.length)));
   } else {
