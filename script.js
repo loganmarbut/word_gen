@@ -1,16 +1,15 @@
 'use strict';
 
 // === CONFIG ===
-// Put both JSON file paths here (URL-encoded if they contain spaces/commas).
-// Files should sit in the same folder as index.html.
+// All JSON files to load and merge (URL-encoded spaces)
 const JSON_PATHS = [
   "Opinion%20and%20argument.json",
-  "Doubt,%20guessing%20and%20certainty.json"
+  "Doubt,%20guessing%20and%20certainty.json",
+  "Discussion%20and%20agreement.json"
 ];
-
 const LEVELS = ["A1","A2","B1","B2","C1","C2"];
 
-// Optional: map overrides for definitions if your JSON doesn't include them yet.
+// Optional: quick custom definitions (left empty since we're skipping definitions)
 const definitionsOverride = {};
 
 let DATA = [];
@@ -102,22 +101,19 @@ function render(items) {
     title.appendChild(badges);
     card.appendChild(title);
 
-    const defText = (item.definition && String(item.definition).trim()) || definitionsOverride[item.term];
+    const existing = (item.definition && String(item.definition).trim()) || definitionsOverride[item.term];
     const def = document.createElement('div');
     def.className = 'def';
-    if (defText) {
-      def.textContent = defText;
+    if (existing) {
+      def.textContent = existing;
     } else {
-      def.innerHTML = `<span class="no-def">No definition provided in JSON.</span>`;
-    }
-    card.appendChild(def);
-
-    if (!defText && item.term) {
+      def.innerHTML = `<span class="no-def">No definition provided.</span>`;
       const more = document.createElement('div');
       more.className = 'more';
       more.innerHTML = `Look it up: <a target="_blank" rel="noopener" href="${dictionaryUrl(item.term)}">${item.term}</a>`;
       card.appendChild(more);
     }
+    card.appendChild(def);
 
     list.appendChild(card);
   }
