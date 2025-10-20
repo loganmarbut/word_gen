@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Word Generator</title>
-  <link rel="stylesheet" href="styles.css?v=6">
+  <link rel="stylesheet" href="styles.css?v=7">
 </head>
 <body>
   <div class="wrap">
@@ -13,11 +13,9 @@
         <input type="range" id="level" min="0" max="5" step="1" value="0" aria-label="Select CEFR level A1 to C2">
         <div class="marks" aria-hidden="true">
           <span>A1</span><span>A2</span><span>B1</span><span>B2</span><span>C1</span><span>C2</span>
-          <div id="levelTick" class="tick" aria-hidden="true"></div>
         </div>
       </div>
 
-      <!-- Custom dropdown gets hydrated by JS -->
       <div id="topicDropdown" class="dropdown" data-default="all"></div>
 
       <button id="btn" class="btn">⚡ Generate</button>
@@ -26,6 +24,6 @@
 
     <div id="list" class="list" aria-live="polite" aria-busy="false"></div>
   </div>
-  <script src="script.js?v=6"></script>
+  <script src="script.js?v=7"></script>
 </body>
 </html>

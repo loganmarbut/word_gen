@@ -13,7 +13,6 @@ const list = document.getElementById('list');
 const btn = document.getElementById('btn');
 const levelSlider = document.getElementById('level');
 const themeBtn = document.getElementById('themeToggle');
-const levelTick = document.getElementById('levelTick');
 const ddRoot = document.getElementById('topicDropdown');
 
 // ---- Theme handling ----
@@ -31,16 +30,16 @@ themeBtn?.addEventListener('click', () => {
   applyTheme(current === 'dark' ? 'light' : 'dark');
 });
 
-// ---- Slider tick alignment ----
-function updateTick(){
+// ---- Slider fill + alignment ----
+function updateSliderVisuals(){
   const min = Number(levelSlider.min), max = Number(levelSlider.max);
   const val = Number(levelSlider.value);
   const pct = (val - min) / (max - min);
-  levelTick.style.left = `${pct * 100}%`;
+  levelSlider.style.setProperty('--fill', `${pct * 100}%`);
 }
-levelSlider.addEventListener('input', updateTick);
-window.addEventListener('resize', updateTick);
-updateTick();
+levelSlider.addEventListener('input', updateSliderVisuals);
+window.addEventListener('resize', updateSliderVisuals);
+updateSliderVisuals();
 
 // ---- Custom dropdown (Topic) ----
 const TopicDropdown = (() => {
@@ -190,7 +189,8 @@ function currentLevel() {
 }
 
 function currentTopic() {
-  return ddRoot ? ddRoot.querySelector('.dd-option[aria-selected="true"]').dataset.value : 'all';
+  const selected = ddRoot.querySelector('.dd-option[aria-selected="true"]');
+  return selected ? selected.dataset.value : 'all';
 }
 
 async function generate() {
