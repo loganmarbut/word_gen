@@ -52,7 +52,9 @@ body {
   background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(0,0,0,.06)), var(--card);
   border: 1px solid var(--ring);
   outline: none;
-  width: 100%;
+  /* Make the visual track span from the thumb center at start to thumb center at end */
+  width: calc(100% - var(--thumb));
+  margin: 0 calc(var(--thumb) / 2);
 }
 /* WebKit thumb */
 .level-picker input[type="range"]::-webkit-slider-thumb {
@@ -80,9 +82,9 @@ body {
   font-size: .8rem;
   color: var(--muted);
   user-select: none;
-  padding: 0 calc(var(--thumb) / 2); /* Align labels with thumb center */
-  width: 100%;
-  box-sizing: border-box;
+  /* Match the track's left/right offsets exactly */
+  width: calc(100% - var(--thumb));
+  margin: 0 calc(var(--thumb) / 2);
 }
 .level-picker .marks span { text-align: center; }
 
