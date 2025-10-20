@@ -8,6 +8,9 @@
   --ring: #2b3553;
   --thumb: 22px;
   --track-h: 8px;
+  --radius: 12px;
+  --shadow: 0 6px 16px rgba(0,0,0,.12);
+  --shadow-soft: 0 4px 10px rgba(0,0,0,.08);
 }
 html[data-theme="light"] {
   --bg: #f7f8fb;
@@ -30,20 +33,23 @@ body {
 
 .wrap { max-width: 980px; margin: 60px auto; padding: 0 20px; }
 
-/* Controls layout (no jumping) */
+/* Controls split into two rows to avoid weird vertical alignment */
 .controls {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: 1fr;
   gap: 14px;
   margin: 10px auto 24px;
+}
+.toolbar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
   flex-wrap: wrap;
 }
-.level-picker { flex: 1 1 560px; min-width: 300px; padding: 0 calc(var(--thumb) / 2); display: flex; flex-direction: column; gap: 6px; }
-.dropdown    { flex: 0 1 260px; min-width: 180px; }
-.btn         { flex: 0 0 auto; }
 
 /* --- Level slider --- */
+.level-picker { padding: 0 calc(var(--thumb) / 2); display: flex; flex-direction: column; gap: 6px; }
 .level-picker input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
@@ -118,21 +124,20 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  border: 2px solid var(--ring);
-  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.06)), var(--card);
+  border: 1px solid var(--ring);
+  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.05)), var(--card);
   color: var(--text);
-  padding: 10px 14px;
-  border-radius: 12px;
+  padding: 8px 12px;
+  border-radius: var(--radius);
   font-weight: 600;
   cursor: pointer;
   line-height: 1.1;
-  box-shadow: 0 6px 18px rgba(0,0,0,.08);
-  width: 100%;
-  max-width: 100%;
+  box-shadow: var(--shadow-soft);
+  height: 40px;
 }
 .dd-trigger span {
   display: inline-block;
-  max-width: calc(100% - 18px);
+  max-width: 220px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -143,22 +148,22 @@ body {
   position: absolute;
   top: calc(100% + 8px);
   left: 0;
-  min-width: 240px;
-  width: max(240px, 100%);
-  border: 2px solid var(--ring);
-  border-radius: 12px;
+  min-width: 220px;
+  width: max(220px, 100%);
+  border: 1px solid var(--ring);
+  border-radius: var(--radius);
   background: var(--card);
   padding: 6px;
-  box-shadow: 0 20px 40px rgba(0,0,0,.3);
-  display: none;               /* HIDE by default */
+  box-shadow: var(--shadow);
+  display: none;
   z-index: 20;
-  list-style: none;            /* NO BULLETS */
-  margin: 0;                   /* Reset */
+  list-style: none;
+  margin: 0;
 }
 .dropdown.open .dd-menu { display: block; }
 .dd-option {
   list-style: none;
-  padding: 10px 12px;
+  padding: 9px 10px;
   border-radius: 10px;
   cursor: pointer;
   color: var(--text);
@@ -166,22 +171,24 @@ body {
 .dd-option:hover { background: color-mix(in oklab, var(--card), var(--accent) 10%); }
 .dd-option[aria-selected="true"] { background: color-mix(in oklab, var(--card), var(--accent) 15%); }
 
-/* --- Buttons (earlier look) --- */
+/* --- Buttons (softer, inline height 40px) --- */
 .btn {
   appearance: none;
-  border: 2px solid var(--ring);
-  background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(0,0,0,.06)), var(--card);
+  border: 1px solid var(--ring);
+  background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(0,0,0,.05)), var(--card);
   color: var(--text);
-  padding: 10px 16px;
-  border-radius: 14px;
+  padding: 8px 14px;
+  border-radius: var(--radius);
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 8px 22px rgba(0,0,0,.10);
+  box-shadow: var(--shadow-soft);
+  height: 40px;
+  line-height: 24px;
   transition: transform .06s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
 }
 .btn:hover { 
   border-color: color-mix(in oklab, var(--ring), var(--accent) 28%); 
-  background: color-mix(in oklab, var(--card) 92%, white 8%);
+  background: color-mix(in oklab, var(--card) 90%, white 10%);
 }
 .btn:active { transform: translateY(1px) scale(.99); }
 .btn:focus-visible { outline: none; box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 24%, transparent); }
