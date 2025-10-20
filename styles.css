@@ -52,7 +52,7 @@ body {
   background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(0,0,0,.06)), var(--card);
   border: 1px solid var(--ring);
   outline: none;
-  /* Make the visual track span from the thumb center at start to thumb center at end */
+  /* Visual track spans from thumb center at start to thumb center at end */
   width: calc(100% - var(--thumb));
   margin: 0 calc(var(--thumb) / 2);
 }
@@ -76,17 +76,30 @@ body {
   box-shadow: 0 3px 10px rgba(0,0,0,.25);
   cursor: pointer;
 }
+
+/* Labels aligned to exact value percentages */
 .level-picker .marks {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  font-size: .8rem;
-  color: var(--muted);
-  user-select: none;
-  /* Match the track's left/right offsets exactly */
+  position: relative;
+  height: 1.1rem;
   width: calc(100% - var(--thumb));
   margin: 0 calc(var(--thumb) / 2);
+  user-select: none;
+  color: var(--muted);
+  font-size: .8rem;
 }
-.level-picker .marks span { text-align: center; }
+.level-picker .marks span {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  text-align: center;
+  min-width: 2ch;
+}
+.level-picker .marks span:nth-child(1) { left: 0%;   transform: translateX(0); }
+.level-picker .marks span:nth-child(2) { left: 20%; }
+.level-picker .marks span:nth-child(3) { left: 40%; }
+.level-picker .marks span:nth-child(4) { left: 60%; }
+.level-picker .marks span:nth-child(5) { left: 80%; }
+.level-picker .marks span:nth-child(6) { left: 100%; transform: translateX(-100%); }
 
 .btn {
   appearance: none;
