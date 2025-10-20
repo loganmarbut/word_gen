@@ -43,18 +43,17 @@ body {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  padding: 0 calc(var(--thumb) / 2); /* makes labels align with thumb center */
+  padding: 0 calc(var(--thumb) / 2);
 }
 .level-picker input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
-  height: var(--thumb); /* big enough so thumb never clips */
+  height: var(--thumb);
   background: transparent;
   margin: 0;
   cursor: pointer;
 }
-/* unified track (webkit + firefox) */
 .level-picker input[type="range"]::-webkit-slider-runnable-track {
   height: var(--track-h);
   border-radius: 999px;
@@ -67,7 +66,6 @@ body {
   background: var(--card);
   box-shadow: 0 0 0 1px var(--ring) inset;
 }
-/* thumbs */
 .level-picker input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   width: var(--thumb); height: var(--thumb);
@@ -75,7 +73,7 @@ body {
   background: var(--accent);
   border: 0;
   box-shadow: 0 3px 10px rgba(0,0,0,.25);
-  margin-top: calc((var(--track-h) - var(--thumb)) / 2); /* centers thumb vertically */
+  margin-top: calc((var(--track-h) - var(--thumb)) / 2);
 }
 .level-picker input[type="range"]::-moz-range-thumb {
   width: var(--thumb); height: var(--thumb);
@@ -84,7 +82,6 @@ body {
   border: 0;
   box-shadow: 0 3px 10px rgba(0,0,0,.25);
 }
-/* Labels at exact percentages of usable width */
 .level-picker .marks {
   position: relative;
   height: 1.1rem;
@@ -106,7 +103,6 @@ body {
 .level-picker .marks span:nth-child(4) { left: 60%; }
 .level-picker .marks span:nth-child(5) { left: 80%; }
 .level-picker .marks span:nth-child(6) { left: 100%; transform: translateX(-100%); }
-/* Tick under the thumb for debug/assurance */
 .tick {
   position: absolute;
   top: -6px;
@@ -119,8 +115,51 @@ body {
   pointer-events: none;
 }
 
-/* --- Buttons & select --- */
-.btn, .select {
+/* --- Custom dropdown --- */
+.dropdown { position: relative; }
+.dd-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 2px solid var(--ring);
+  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.06)), var(--card);
+  color: var(--text);
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  line-height: 1.1;
+  box-shadow: 0 6px 18px rgba(0,0,0,.08);
+}
+.dd-trigger .chev { transition: transform .15s ease; }
+.dropdown.open .chev { transform: rotate(180deg); }
+.dd-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 240px;
+  border: 2px solid var(--ring);
+  border-radius: 12px;
+  background: var(--card);
+  padding: 6px;
+  box-shadow: 0 20px 40px rgba(0,0,0,.3);
+  display: none;
+  z-index: 20;
+}
+.dropdown.open .dd-menu { display: block; }
+.dd-option {
+  list-style: none;
+  padding: 10px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  color: var(--text);
+}
+.dd-option:hover { background: color-mix(in oklab, var(--card), var(--accent) 10%); }
+.dd-option[aria-selected="true"] { background: color-mix(in oklab, var(--card), var(--accent) 15%); }
+.dd-option .sub { color: var(--muted); font-weight: 500; margin-left: 6px; }
+
+/* --- Buttons --- */
+.btn {
   appearance: none;
   border: 1px solid var(--ring);
   background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.06)), var(--card);
@@ -132,15 +171,7 @@ body {
   box-shadow: 0 6px 18px rgba(0,0,0,.08);
   transition: transform .05s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
 }
-.select { 
-  font-weight: 500; 
-  line-height: 1.2;
-  padding-right: 36px; 
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5' stroke='%2398a0b3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); 
-  background-repeat: no-repeat; 
-  background-position: right 10px center; 
-}
-.btn:hover, .select:hover { border-color: color-mix(in oklab, var(--ring), var(--accent)); background: color-mix(in oklab, var(--card) 85%, transparent); }
+.btn:hover { border-color: color-mix(in oklab, var(--ring), var(--accent)); background: color-mix(in oklab, var(--card) 85%, transparent); }
 .btn:active { transform: translateY(1px) scale(.99); }
 
 /* --- Cards --- */
@@ -155,11 +186,8 @@ body {
 .term { font-size: 1.05rem; font-weight: 700; letter-spacing: .2px; }
 .badges { display: inline-flex; gap: 8px; margin-left: 10px; vertical-align: middle; }
 .badge { font-size: .7rem; color: var(--muted); border: 1px solid var(--ring); padding: 3px 7px; border-radius: 999px; }
-/* Cleaner hint row */
 .meta {
   display: flex;
-  justify-content: flex-start;
-  align-items: center;
   gap: 10px;
   margin-top: 8px;
   font-size: .82rem;

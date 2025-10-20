@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Word Generator</title>
-  <link rel="stylesheet" href="styles.css?v=5">
+  <link rel="stylesheet" href="styles.css?v=6">
 </head>
 <body>
   <div class="wrap">
@@ -17,12 +17,8 @@
         </div>
       </div>
 
-      <select id="topic" class="select" aria-label="Choose topic">
-        <option value="all">All topics</option>
-        <option value="Opinion & Argument">Opinion & Argument</option>
-        <option value="Doubt, guessing and certainty">Doubt, guessing and certainty</option>
-        <option value="Discussion and agreement">Discussion and agreement</option>
-      </select>
+      <!-- Custom dropdown gets hydrated by JS -->
+      <div id="topicDropdown" class="dropdown" data-default="all"></div>
 
       <button id="btn" class="btn">⚡ Generate</button>
       <button id="themeToggle" class="btn" aria-label="Toggle light/dark theme">☀️ Light</button>
@@ -30,6 +26,6 @@
 
     <div id="list" class="list" aria-live="polite" aria-busy="false"></div>
   </div>
-  <script src="script.js?v=5"></script>
+  <script src="script.js?v=6"></script>
 </body>
 </html>

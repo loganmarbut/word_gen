@@ -8,15 +8,13 @@ const SOURCES = [
 ];
 const LEVELS = ["A1","A2","B1","B2","C1","C2"];
 
-const definitionsOverride = {}; // keeping for future use
-
 let DATA = [];
 const list = document.getElementById('list');
 const btn = document.getElementById('btn');
 const levelSlider = document.getElementById('level');
 const themeBtn = document.getElementById('themeToggle');
-const topicSelect = document.getElementById('topic');
 const levelTick = document.getElementById('levelTick');
+const ddRoot = document.getElementById('topicDropdown');
 
 // ---- Theme handling ----
 function applyTheme(theme) {
@@ -37,12 +35,73 @@ themeBtn?.addEventListener('click', () => {
 function updateTick(){
   const min = Number(levelSlider.min), max = Number(levelSlider.max);
   const val = Number(levelSlider.value);
-  const pct = (val - min) / (max - min); // 0..1
+  const pct = (val - min) / (max - min);
   levelTick.style.left = `${pct * 100}%`;
 }
 levelSlider.addEventListener('input', updateTick);
 window.addEventListener('resize', updateTick);
 updateTick();
+
+// ---- Custom dropdown (Topic) ----
+const TopicDropdown = (() => {
+  const state = { open: false, value: ddRoot?.dataset.default || 'all' };
+  const trigger = document.createElement('button');
+  trigger.type = 'button';
+  trigger.className = 'dd-trigger';
+  trigger.setAttribute('aria-haspopup', 'listbox');
+  trigger.setAttribute('aria-expanded', 'false');
+
+  const label = document.createElement('span');
+  label.textContent = 'All topics';
+  const chev = document.createElementNS('http://www.w3.org/2000/svg','svg');
+  chev.setAttribute('class','chev');
+  chev.setAttribute('width','16'); chev.setAttribute('height','16'); chev.setAttribute('viewBox','0 0 24 24');
+  chev.innerHTML = "<path d='M7 10l5 5 5-5' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/>";
+  trigger.append(label, chev);
+
+  const menu = document.createElement('ul');
+  menu.className = 'dd-menu';
+  menu.setAttribute('role','listbox');
+  menu.tabIndex = -1;
+
+  function setOpen(v){
+    state.open = v;
+    ddRoot.classList.toggle('open', v);
+    trigger.setAttribute('aria-expanded', String(v));
+    if (v) {
+      menu.style.minWidth = trigger.offsetWidth + 'px';
+      menu.focus();
+    }
+  }
+  function setValue(val, text){
+    state.value = val;
+    label.textContent = text;
+    Array.from(menu.children).forEach(li => li.setAttribute('aria-selected', String(li.dataset.value === val)));
+    setOpen(false);
+  }
+  function buildOptions(){
+    const topics = ['all', ...Array.from(new Set(SOURCES.map(s => s.topic)))];
+    menu.innerHTML = '';
+    topics.forEach(t => {
+      const li = document.createElement('li');
+      li.className = 'dd-option';
+      li.setAttribute('role','option');
+      li.dataset.value = t;
+      li.textContent = t === 'all' ? 'All topics' : t;
+      li.setAttribute('aria-selected', String(t === state.value));
+      li.addEventListener('click', () => setValue(t, li.textContent));
+      menu.appendChild(li);
+    });
+  }
+  trigger.addEventListener('click', () => setOpen(!state.open));
+  document.addEventListener('click', (e) => {
+    if (!ddRoot.contains(e.target)) setOpen(false);
+  });
+  ddRoot.append(trigger, menu);
+  buildOptions();
+  setValue(state.value, 'All topics');
+  return { get value(){ return state.value; } };
+})();
 
 // ---- Data + render ----
 async function loadJSON() {
@@ -108,14 +167,9 @@ function render(items) {
       b2.textContent = item.level;
       badges.appendChild(b2);
     }
-    // remove topic badge to reduce clutter
-
     title.appendChild(badges);
     card.appendChild(title);
 
-    const existing = (item.definition && String(item.definition).trim()) || definitionsOverride[item.term];
-
-    // Cleaner, minimal meta row instead of the bulky message
     const meta = document.createElement('div');
     meta.className = 'meta';
     const link = document.createElement('a');
@@ -136,7 +190,7 @@ function currentLevel() {
 }
 
 function currentTopic() {
-  return topicSelect?.value || 'all';
+  return ddRoot ? ddRoot.querySelector('.dd-option[aria-selected="true"]').dataset.value : 'all';
 }
 
 async function generate() {
