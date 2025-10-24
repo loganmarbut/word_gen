@@ -294,3 +294,60 @@ body {
 .level-picker input:disabled::-webkit-slider-thumb { width: 0; height: 0; opacity: 0; }
 .level-picker input:disabled::-moz-range-thumb { width: 0; height: 0; opacity: 0; }
 .level-picker input:disabled::-ms-thumb { width: 0; height: 0; opacity: 0; }
+
+
+/* v15: overlay 'All levels' toggle to the right of the full-width slider */
+.level-picker { position: relative; }
+.level-row { position: relative; min-height: 44px; padding-right: 132px; }
+.level-row input[type="range"] { width: 100%; display: block; }
+.level-picker .level-toggle {
+  position: absolute; right: 0; top: 50%; transform: translateY(-50%);
+}
+.marks { margin-top: 10px; }
+
+/* Hide the slider thumb when disabled */
+.level-picker input:disabled { --thumb: 0px; opacity: .55; cursor: not-allowed; }
+.level-picker input:disabled::-webkit-slider-thumb { width: 0; height: 0; opacity: 0; }
+.level-picker input:disabled::-moz-range-thumb { width: 0; height: 0; opacity: 0; }
+.level-picker input:disabled::-ms-thumb { width: 0; height: 0; opacity: 0; }
+
+/* Sleeker controls: flatter radius & lighter shadow */
+.btn, .dd-trigger, .toggle {
+  border-radius: 14px;
+  border: 1px solid var(--ring);
+  background: var(--card);
+  box-shadow: 0 1px 2px rgba(0,0,0,.06);
+}
+.btn:hover, .dd-trigger:hover, .toggle:hover { box-shadow: 0 2px 5px rgba(0,0,0,.1); }
+.btn { height: 36px; padding: 0 14px; }
+.dd-trigger { height: 36px; }
+.toggle { height: 36px; }
+
+
+/* v16: precise bubble alignment */
+.btn, .dd-trigger, .toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 14px;
+  line-height: 1; /* ensure perfect vertical centering */
+}
+
+/* Dropdown trigger internals */
+.dd-trigger span,
+.dd-trigger .chev { display: inline-flex; align-items: center; }
+.dd-trigger .chev { font-size: 12px; margin-left: 6px; }
+
+/* Toggle checkbox + label alignment */
+.toggle { padding: 0 12px; }
+.toggle input {
+  display: block;
+  margin: 0;
+  width: 18px; height: 18px;
+}
+.toggle span { display: inline-flex; align-items: center; }
+
+/* Keep the slider area tidy under the new line-height rules */
+.level-row { min-height: 44px; }
