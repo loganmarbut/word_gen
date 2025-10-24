@@ -4,17 +4,13 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Word Generator</title>
-  <link rel="stylesheet" href="styles.css?v=24">
+  <link rel="stylesheet" href="styles.css?v=26">
 </head>
 <body>
   <div class="wrap">
     <div class="controls">
-      <div class="level-picker">
-        <input class="level" type="range" id="level" min="0" max="5" step="1" value="0" aria-label="Select CEFR level A1 to C2">
-        <label class="toggle level-toggle" title="Ignore the level slider">
-          <input id="anyLevel" type="checkbox" aria-controls="level" />
-          <span>All levels</span>
-        </label>
+      <div class="level-picker" role="group" aria-label="CEFR level">
+        <input class="level" id="level" type="range" min="0" max="5" step="1" value="0" aria-label="CEFR level slider" />
         <div class="marks" aria-hidden="true">
           <span>A1</span><span>A2</span><span>B1</span><span>B2</span><span>C1</span><span>C2</span>
         </div>
@@ -22,6 +18,12 @@
 
       <div class="toolbar">
         <div id="topicDropdown" class="dropdown" data-default="all"></div>
+
+        <label class="toggle" title="Ignore the level slider">
+          <input id="anyLevel" type="checkbox" aria-controls="level" />
+          <span>All levels</span>
+        </label>
+
         <button id="btn" class="btn">⚡ Generate</button>
         <button id="themeToggle" class="btn" aria-label="Toggle light/dark theme">🌙 Dark</button>
       </div>
@@ -29,6 +31,6 @@
 
     <div id="list" class="list" aria-live="polite" aria-busy="false"></div>
   </div>
-  <script src="script.js?v=24"></script>
+  <script src="script.js?v=26"></script>
 </body>
 </html>

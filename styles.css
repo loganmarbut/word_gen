@@ -1,562 +1,96 @@
-:root {
-  --bg: #0b0d12;
-  --card: #121521;
-  --text: #e6e9ef;
-  --muted: #98a0b3;
-  --accent: #7c9eff;
-  --accent-soft: #9cb3ff;
-  --ring: #2b3553;
-  --thumb: 22px;
-  --track-h: 8px;
-  --radius: 12px;
-  --shadow: 0 6px 16px rgba(0,0,0,.12);
-  --shadow-soft: 0 4px 10px rgba(0,0,0,.08);
-}
-html[data-theme="light"] {
-  --bg: #f7f8fb;
-  --card: #ffffff;
-  --text: #1f2330;
-  --muted: #667085;
-  --accent: #3b82f6;
-  --accent-soft: #8db3ff;
-  --ring: #e5e7eb;
-}
 
-* { box-sizing: border-box; }
-html, body { height: 100%; }
-body {
-  margin: 0;
-  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-  background: var(--bg);
-  color: var(--text);
+:root{
+  --bg: #f6f7fb; --fg:#0f172a; --muted:#6b7280; --ring:#e5e7eb; --card:#fff;
+  --accent:#6f8ef6; --radius:12px;
+  --shadow-soft: 0 6px 28px rgba(0,0,0,.08);
 }
+html[data-theme="dark"]{
+  --bg:#0b0f1a; --fg:#e5e7eb; --muted:#a1a1aa; --ring:#1f2937; --card:#0f172a;
+  --accent:#7aa2ff; --shadow-soft: 0 8px 30px rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.45 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji'; background:var(--bg); color:var(--fg);}
+.wrap{max-width:1100px;margin:0 auto;padding:28px 22px 60px}
 
-.wrap { max-width: 980px; margin: 60px auto; padding: 0 20px; }
-
-/* Controls split into two rows to avoid weird vertical alignment */
-.controls {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 14px;
-  margin: 10px auto 24px;
-}
-.toolbar {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-/* --- Level slider --- */
-.level-picker { padding: 0 calc(var(--thumb) / 2); display: flex; flex-direction: column; gap: 6px; }
-.level-picker input[type="range"] {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 100%;
-  height: var(--thumb);
-  background: transparent;
-  margin: 0;
-  cursor: pointer;
-  --fill: 0%;
-}
-.level-picker input[type="range"]::-webkit-slider-runnable-track {
-  height: var(--track-h);
-  border-radius: 999px;
-  background: linear-gradient(to right,
-              var(--accent-soft) 0%,
-              var(--accent-soft) var(--fill),
-              var(--card) var(--fill),
-              var(--card) 100%);
-  box-shadow: 0 0 0 1px var(--ring) inset;
-}
-.level-picker input[type="range"]::-moz-range-track {
-  height: var(--track-h);
-  border-radius: 999px;
-  background: linear-gradient(to right,
-              var(--accent-soft) 0%,
-              var(--accent-soft) var(--fill),
-              var(--card) var(--fill),
-              var(--card) 100%);
-  box-shadow: 0 0 0 1px var(--ring) inset;
-}
-.level-picker input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: var(--thumb); height: var(--thumb);
-  border-radius: 50%;
-  background: var(--accent);
-  border: 0;
-  box-shadow: 0 3px 10px rgba(0,0,0,.25);
-  margin-top: calc((var(--track-h) - var(--thumb)) / 2);
-}
-.level-picker input[type="range"]::-moz-range-thumb {
-  width: var(--thumb); height: var(--thumb);
-  border-radius: 50%;
-  background: var(--accent);
-  border: 0;
-  box-shadow: 0 3px 10px rgba(0,0,0,.25);
-}
-.level-picker .marks {
-  position: relative;
-  height: 1.1rem;
-  width: 100%;
-  user-select: none;
-  color: var(--muted);
-  font-size: .8rem;
-}
-.level-picker .marks span {
-  position: absolute;
-  top: 0;
-  transform: translateX(-50%);
-  text-align: center;
-  min-width: 2ch;
-}
-.level-picker .marks span:nth-child(1) { left: 0%;   transform: translateX(0); }
-.level-picker .marks span:nth-child(2) { left: 20%; }
-.level-picker .marks span:nth-child(3) { left: 40%; }
-.level-picker .marks span:nth-child(4) { left: 60%; }
-.level-picker .marks span:nth-child(5) { left: 80%; }
-.level-picker .marks span:nth-child(6) { left: 100%; transform: translateX(-100%); }
-
-/* --- Custom dropdown --- */
-.dropdown { position: relative; }
-.dd-trigger {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  border: 1px solid var(--ring);
-  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.05)), var(--card);
-  color: var(--text);
-  padding: 8px 12px;
-  border-radius: var(--radius);
-  font-weight: 600;
-  cursor: pointer;
-  line-height: 1.1;
-  box-shadow: var(--shadow-soft);
-  height: 40px;
-}
-.dd-trigger span {
-  display: inline-block;
-  max-width: 220px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.dd-trigger .chev { flex: 0 0 auto; transition: transform .15s ease; }
-.dropdown.open .chev { transform: rotate(180deg); }
-.dd-menu {
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 0;
-  min-width: 220px;
-  width: max(220px, 100%);
-  border: 1px solid var(--ring);
-  border-radius: var(--radius);
-  background: var(--card);
-  padding: 6px;
-  box-shadow: var(--shadow);
-  display: none;
-  z-index: 20;
-  list-style: none;
-  margin: 0;
-}
-.dropdown.open .dd-menu { display: block; }
-.dd-option {
-  list-style: none;
-  padding: 9px 10px;
-  border-radius: 10px;
-  cursor: pointer;
-  color: var(--text);
-}
-.dd-option:hover { background: color-mix(in oklab, var(--card), var(--accent) 10%); }
-.dd-option[aria-selected="true"] { background: color-mix(in oklab, var(--card), var(--accent) 15%); }
-
-/* --- Buttons (softer, inline height 40px) --- */
-.btn {
-  appearance: none;
-  border: 1px solid var(--ring);
-  background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(0,0,0,.05)), var(--card);
-  color: var(--text);
-  padding: 8px 14px;
-  border-radius: var(--radius);
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: var(--shadow-soft);
-  height: 40px;
-  line-height: 24px;
-  transition: transform .06s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
-}
-.btn:hover { 
-  border-color: color-mix(in oklab, var(--ring), var(--accent) 28%); 
-  background: color-mix(in oklab, var(--card) 90%, white 10%);
-}
-.btn:active { transform: translateY(1px) scale(.99); }
-.btn:focus-visible { outline: none; box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 24%, transparent); }
-
-/* --- Cards --- */
-.list { margin-top: 24px; display: grid; grid-template-columns: 1fr; gap: 14px; }
-.card {
-  background: var(--card);
-  border: 1px solid var(--ring);
-  border-radius: 16px;
-  padding: 16px 18px;
-  box-shadow: 0 10px 28px rgba(0,0,0,.12);
-}
-.term { font-size: 1.05rem; font-weight: 700; letter-spacing: .2px; }
-.badges { display: inline-flex; gap: 8px; margin-left: 10px; vertical-align: middle; }
-.badge { font-size: .7rem; color: var(--muted); border: 1px solid var(--ring); padding: 3px 7px; border-radius: 999px; }
-.meta {
-  display: flex;
-  gap: 10px;
-  margin-top: 8px;
-  font-size: .82rem;
-  color: var(--muted);
-}
-.meta a { color: var(--muted); text-decoration: none; }
-.meta a:hover { text-decoration: underline; }
-
-
-/* v17: robust layout + alignment fixes */
-.level-row{
-  display:grid;
-  grid-template-columns: 1fr auto;
-  align-items:center;
-  gap:12px;
-}
-.level-row input[type="range"]{ min-width:0; width:100%; }
-.level-picker .level-toggle{ white-space:nowrap; }
-
-/* Ensure all "bubbles" have crisp vertical centering and no wrapping */
-.btn, .dd-trigger, .toggle{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-  height:36px;
-  padding:0 14px;
-  line-height:1;
-  border-radius:12px;
-  border:1px solid var(--ring);
-  background:var(--card);
-  box-shadow:0 1px 2px rgba(0,0,0,.06);
-}
-.btn:hover, .dd-trigger:hover, .toggle:hover{ box-shadow:0 2px 5px rgba(0,0,0,.1); }
-
-/* Checkbox + label alignment */
-.toggle input{ width:18px; height:18px; margin:0; display:inline-block; }
-.toggle span{ display:inline-flex; align-items:center; }
-
-/* Keep marks spaced under the row */
-.marks{ margin-top:10px; }
-
-/* Hide the slider thumb and dim the track when disabled */
-.level-picker input:disabled{ --thumb:0px; opacity:.5; cursor:not-allowed; }
-.level-picker input:disabled::-webkit-slider-thumb{ width:0; height:0; opacity:0; }
-.level-picker input:disabled::-moz-range-thumb{ width:0; height:0; opacity:0; }
-.level-picker input:disabled::-ms-thumb{ width:0; height:0; opacity:0; }
-
-
-/* v18: Grid-based level picker so marks align under the slider column */
-.level-picker{
-  display:grid;
-  grid-template-columns: 1fr auto;
-  grid-template-areas:
-    "slider toggle"
-    "marks  toggle";
-  align-items:center;
-  column-gap:12px;
-}
-.level-picker .level{ grid-area: slider; width:100%; min-width:0; }
-.level-picker .level-toggle{ grid-area: toggle; white-space:nowrap; }
-.level-picker .marks{ grid-area: marks; margin-top:10px; }
-
-/* Ensure marks use equal columns (if not already in base css) */
-.level-picker .marks{
-  display:grid;
-  grid-template-columns: repeat(6, 1fr);
-}
-
-/* Hide slider thumb when disabled */
-.level-picker .level:disabled{ --thumb:0px; opacity:.5; cursor:not-allowed; }
-.level-picker .level:disabled::-webkit-slider-thumb{ width:0; height:0; opacity:0; }
-.level-picker .level:disabled::-moz-range-thumb{ width:0; height:0; opacity:0; }
-.level-picker .level:disabled::-ms-thumb{ width:0; height:0; opacity:0; }
-
-
-/* v19: rock-solid layout + alignment */
+.controls{margin-bottom:18px}
 .level-picker{
   display:grid;
   grid-template-columns: 1fr max-content;
-  grid-template-areas:
-    "slider toggle"
-    "marks  toggle";
-  align-items:center;
-  column-gap:16px;
-}
-.level-picker .level{ grid-area: slider; width:100%; min-width:0; }
-.level-picker .level-toggle{ grid-area: toggle; justify-self:end; white-space:nowrap; }
-
-.level-picker .marks{
-  grid-area: marks;
-  margin-top:10px;
-  display:grid;
-  grid-template-columns: repeat(6, 1fr);
-}
-
-/* Sleeker controls + perfect centering */
-.btn, .dd-trigger, .toggle{
-  display:inline-flex; align-items:center; justify-content:center;
-  gap:8px; height:36px; padding:0 14px; line-height:1;
-  border-radius:12px; border:1px solid var(--ring); background:var(--card);
-  box-shadow:0 1px 2px rgba(0,0,0,.06);
-}
-.btn:hover, .dd-trigger:hover, .toggle:hover{ box-shadow:0 2px 5px rgba(0,0,0,.1); }
-
-/* Hide slider thumb when disabled */
-.level-picker .level:disabled{ --thumb:0px; opacity:.5; cursor:not-allowed; }
-.level-picker .level:disabled::-webkit-slider-thumb{ width:0; height:0; opacity:0; }
-.level-picker .level:disabled::-moz-range-thumb{ width:0; height:0; opacity:0; }
-.level-picker .level:disabled::-ms-thumb{ width:0; height:0; opacity:0; }
-
-/* v20: space between multiple dictionary links */
-.meta a + a { margin-left: 12px; }
-
-
-/* v21: align 'All levels' and unify type */
-.level-picker{
-  grid-template-columns: 1fr max-content;
-  column-gap: 24px; /* a bit more breathing room */
-}
-.level-picker .level{ width:100%; min-width:0; margin:0; } /* remove UA margins */
-.level-picker .level-toggle{
-  justify-self:end;
-  white-space:nowrap;
-  height:36px;
-}
-
-.btn, .dd-trigger, .toggle{
-  font-family: inherit;
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: .2px;
-}
-
-/* Custom checkbox so alignment matches buttons across platforms */
-.toggle{
-  display:inline-flex; align-items:center; gap:10px; padding:0 14px;
-}
-.toggle input{
-  appearance:none; -webkit-appearance:none; -moz-appearance:none;
-  width:18px; height:18px; border-radius:6px;
-  border:1.5px solid var(--ring);
-  background: var(--card);
-  position:relative; display:inline-block; margin:0;
-}
-.toggle input::after{
-  content:""; position:absolute; inset:3.5px; border-radius:3px;
-  background: transparent;
-}
-.toggle input:checked::after{ background: var(--accent); }
-.toggle input:focus-visible{ outline:none; box-shadow:0 0 0 3px color-mix(in lab, var(--accent) 25%, transparent); border-color: var(--accent); }
-.toggle span{ line-height:1; display:inline-flex; align-items:center; }
-
-
-/* v22: align toggle with slider bar and show both dictionary links cleanly */
-.level-picker{
-  display:grid;
-  grid-template-columns: 1fr max-content;
-  grid-template-rows: auto auto;
-  grid-template-areas:
-    "slider toggle"
-    "marks  marks";
-  align-items:center;
-  column-gap:16px;
-}
-.level-picker .level{ grid-area: slider; width:100%; min-width:0; margin:0; }
-.level-picker .level-toggle{ grid-area: toggle; justify-self:end; align-self:center; white-space:nowrap; height:36px; }
-.level-picker .marks{
-  grid-area: marks;
-  margin-top:10px;
-  display:grid;
-  grid-template-columns: repeat(6, 1fr);
-}
-
-/* Ensure spacing between multiple links in card meta */
-.meta a + a { margin-left: 14px; }
-
-/* Hide slider thumb & dim track when disabled */
-.level-picker .level:disabled{ --thumb:0px; opacity:.5; cursor:not-allowed; }
-.level-picker .level:disabled::-webkit-slider-thumb{ width:0; height:0; opacity:0; }
-.level-picker .level:disabled::-moz-range-thumb{ width:0; height:0; opacity:0; }
-.level-picker .level:disabled::-ms-thumb{ width:0; height:0; opacity:0; }
-
-
-/* v23: robust slider styling and alignment */
-.level-picker{
-  display:grid;
-  grid-template-columns: 1fr max-content;
-  grid-template-rows: auto auto;
-  grid-template-areas:
-    "slider toggle"
-    "marks  marks";
-  align-items:center;
-  column-gap:16px;
-}
-
-/* Base slider track */
-.level-picker .level{
-  grid-area: slider;
-  width:100%;
-  min-width:0;
-  margin:0;
-  -webkit-appearance:none;
-  appearance:none;
-  height:10px;
-  background: linear-gradient(90deg, var(--accent) 0 var(--fill), color-mix(in lab, var(--muted), transparent 35%) var(--fill) 100%);
-  border-radius:999px;
-  outline: none;
-}
-
-/* WebKit thumb */
-.level-picker .level::-webkit-slider-thumb{
-  -webkit-appearance:none;
-  appearance:none;
-  width:22px; height:22px; border-radius:50%;
-  background: var(--accent);
-  box-shadow: 0 2px 6px rgba(0,0,0,.25);
-  border: 2px solid color-mix(in lab, white 70%, var(--accent));
-  margin-top: -6px; /* center the thumb on a 10px track: (22-10)/2 */
-  cursor: pointer;
-}
-
-/* Firefox track + thumb */
-.level-picker .level::-moz-range-track{
-  height:10px; border-radius:999px; background:transparent;
-}
-.level-picker .level::-moz-range-progress{
-  height:10px; border-radius:999px; background: var(--accent);
-}
-.level-picker .level::-moz-range-thumb{
-  width:22px; height:22px; border-radius:50%;
-  background: var(--accent);
-  box-shadow: 0 2px 6px rgba(0,0,0,.25);
-  border: 2px solid color-mix(in lab, white 70%, var(--accent));
-  cursor: pointer;
-}
-
-/* Hide thumb + dim track when disabled (All levels ON) */
-.level-picker .level:disabled{
-  --thumb:0px;
-  background: color-mix(in lab, var(--muted), transparent 35%);
-  cursor: not-allowed;
-  opacity: .6;
-}
-.level-picker .level:disabled::-webkit-slider-thumb{ width:0; height:0; border:0; margin:0; box-shadow:none; opacity:0; }
-.level-picker .level:disabled::-moz-range-thumb{ width:0; height:0; border:0; box-shadow:none; opacity:0; }
-
-/* Toggle box alignment to the track center */
-.level-picker .level-toggle{
-  grid-area: toggle;
-  justify-self:end;
-  align-self:center;
-  white-space:nowrap;
-  height:36px;
-}
-
-/* Marks under full width slider */
-.level-picker .marks{
-  grid-area: marks;
-  margin-top:10px;
-  display:grid;
-  grid-template-columns: repeat(6, 1fr);
-}
-
-
-/* v24: robust slider styling (Chrome/Safari/Firefox) */
-.level-picker{
-  display:grid;
-  grid-template-columns: 1fr max-content;
-  grid-template-rows: auto auto;
   grid-template-areas:
     "slider toggle"
     "marks  marks";
   align-items:center;
   column-gap:18px;
 }
+/* ----- Slider (robust cross-browser) ----- */
+.level{ grid-area:slider; width:100%; min-width:0; margin:0; height:8px;
+  -webkit-appearance:none; appearance:none; background:transparent; outline:none; }
+.level::-webkit-slider-runnable-track{
+  height:8px; border-radius:999px;
+  background: linear-gradient(90deg,
+    var(--accent) 0%,
+    var(--accent) var(--fill,0%),
+    color-mix(in lab, var(--muted), transparent 36%) var(--fill,0%),
+    color-mix(in lab, var(--muted), transparent 36%) 100%);
+}
+.level::-webkit-slider-thumb{
+  -webkit-appearance:none; width:22px; height:22px; border-radius:50%;
+  background:var(--accent); border:2px solid color-mix(in lab, white 72%, var(--accent));
+  box-shadow:0 2px 6px rgba(0,0,0,.25); margin-top:-7px; cursor:pointer;
+}
+/* Firefox */
+.level::-moz-range-track{ height:8px; border-radius:999px; background:color-mix(in lab, var(--muted), transparent 36%); }
+.level::-moz-range-progress{ height:8px; border-radius:999px; background:var(--accent); }
+.level::-moz-range-thumb{ width:22px; height:22px; border-radius:50%; background:var(--accent);
+  border:2px solid color-mix(in lab, white 72%, var(--accent)); box-shadow:0 2px 6px rgba(0,0,0,.25); cursor:pointer; }
+/* Disabled (All levels) */
+.level:disabled{ cursor:not-allowed; opacity:.6; }
+.level:disabled::-webkit-slider-thumb{ width:0;height:0;border:0;margin:0;opacity:0;box-shadow:none; }
+.level:disabled::-moz-range-thumb{ width:0;height:0;border:0;opacity:0;box-shadow:none; }
+.level:disabled::-webkit-slider-runnable-track{ background:color-mix(in lab, var(--muted), transparent 36%); }
+.level:disabled::-moz-range-progress{ background:transparent; }
 
-.level-picker .level{
-  grid-area: slider;
-  width:100%;
-  min-width:0;
-  margin:0;
-  /* remove native */
-  -webkit-appearance:none;
-  appearance:none;
-  height:10px;
-  border-radius:999px;
-  background: transparent; /* track set on pseudos */
-  outline:none;
-}
-/* Track (Chrome/Safari) */
-.level-picker .level::-webkit-slider-runnable-track{
-  height:10px; border-radius:999px;
-  background:
-    linear-gradient(90deg,
-      var(--accent) 0%,
-      var(--accent) var(--fill),
-      color-mix(in lab, var(--muted), transparent 35%) var(--fill),
-      color-mix(in lab, var(--muted), transparent 35%) 100%
-    );
-}
-/* Thumb (Chrome/Safari) */
-.level-picker .level::-webkit-slider-thumb{
-  -webkit-appearance:none;
-  width:22px; height:22px; border-radius:50%;
-  background: var(--accent);
-  border: 2px solid color-mix(in lab, white 70%, var(--accent));
-  box-shadow: 0 2px 6px rgba(0,0,0,.25);
-  margin-top: -6px; /* center thumb on 10px track */
-  cursor:pointer;
-}
+/* Marks */
+.marks{ grid-area:marks; margin-top:10px; display:grid; grid-template-columns:repeat(6,1fr); color:var(--muted); font-size:14px; }
 
-/* Track/Progress (Firefox) */
-.level-picker .level::-moz-range-track{
-  height:10px; border-radius:999px;
-  background: color-mix(in lab, var(--muted), transparent 35%);
-}
-.level-picker .level::-moz-range-progress{
-  height:10px; border-radius:999px;
-  background: var(--accent);
-}
-.level-picker .level::-moz-range-thumb{
-  width:22px; height:22px; border-radius:50%;
-  background: var(--accent);
-  border: 2px solid color-mix(in lab, white 70%, var(--accent));
-  box-shadow: 0 2px 6px rgba(0,0,0,.25);
-  cursor:pointer;
-}
+/* Toggle */
+.toggle{ display:inline-flex; align-items:center; gap:10px; border:1px solid var(--ring); border-radius:999px; padding:0 14px; height:36px; background:var(--card); box-shadow:0 1px 2px rgba(0,0,0,.06); }
+.toggle input{ appearance:none; width:18px; height:18px; border:1.5px solid var(--ring); border-radius:6px; background:var(--card); display:inline-block; position:relative; margin:0; }
+.toggle input::after{ content:""; position:absolute; inset:3.5px; border-radius:3px; background:transparent; }
+.toggle input:checked::after{ background:var(--accent); }
+.toggle span{ font-weight:600; color:var(--fg); }
 
-/* Disabled state (All levels ON) */
-.level-picker .level:disabled{ cursor:not-allowed; opacity:.6; }
-.level-picker .level:disabled::-webkit-slider-thumb{ width:0; height:0; border:0; margin:0; box-shadow:none; opacity:0; }
-.level-picker .level:disabled::-moz-range-thumb{ width:0; height:0; border:0; box-shadow:none; opacity:0; }
-.level-picker .level:disabled::-webkit-slider-runnable-track{
-  background: color-mix(in lab, var(--muted), transparent 35%);
-}
-.level-picker .level:disabled::-moz-range-progress{ background: transparent; }
+/* Toolbar */
+.toolbar{ display:flex; gap:14px; justify-content:center; margin-top:18px; }
+.btn,.dd-trigger{ display:inline-flex; align-items:center; justify-content:center; gap:8px; height:38px; padding:0 16px; border-radius:12px; border:1px solid var(--ring); background:var(--card); box-shadow:0 1px 2px rgba(0,0,0,.06); font-weight:600; }
+.btn:hover,.dd-trigger:hover{ box-shadow:0 2px 5px rgba(0,0,0,.1); }
+.dd-menu{ position:absolute; margin-top:8px; background:var(--card); border:1px solid var(--ring); border-radius:12px; padding:6px; box-shadow:var(--shadow-soft); display:none; }
+.dropdown.open .dd-menu{ display:block; }
+.dd-option{ padding:8px 10px; border-radius:8px; cursor:pointer; }
+.dd-option:hover{ background:color-mix(in lab, var(--accent) 12%, transparent); }
 
-/* Toggle alignment */
-.level-picker .level-toggle{
-  grid-area: toggle;
-  justify-self:end;
-  align-self:center;
-  height:36px; white-space:nowrap;
-}
+/* Cards */
+.list{ margin-top:16px; display:flex; flex-direction:column; gap:18px; }
+.card{ background:var(--card); border-radius:16px; box-shadow:var(--shadow-soft); padding:18px 18px 14px; }
+.term{ font-size:1.25rem; font-weight:800; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.badges{ display:inline-flex; gap:6px; }
+.badge{ font-size:12px; padding:4px 8px; border-radius:999px; border:1px solid var(--ring); color:var(--muted); }
+.meta{ margin-top:8px; font-size:14px; color:var(--muted); }
+.meta a{ color:inherit; text-decoration:none; border-bottom:1px solid currentColor; }
+.meta a + a{ margin-left:14px; }
 
-/* Marks under full-width slider */
-.level-picker .marks{
-  grid-area: marks;
-  margin-top:10px;
+
+/* v26: toggle moved into toolbar */
+.level-picker{
   display:grid;
-  grid-template-columns:repeat(6,1fr);
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "slider"
+    "marks";
+  row-gap: 10px;
 }
+.level-picker .level{ grid-area: slider; }
+.level-picker .marks{ grid-area: marks; }
+
+/* toolbar layout with the new toggle */
+.toolbar{ display:flex; gap:14px; justify-content:center; align-items:center; flex-wrap:wrap; }
