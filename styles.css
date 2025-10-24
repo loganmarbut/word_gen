@@ -254,3 +254,22 @@ body {
 .level-picker input:disabled::-webkit-slider-thumb { opacity: 0; }
 .level-picker input:disabled::-moz-range-thumb { opacity: 0; }
 .level-picker input:disabled::-ms-thumb { opacity: 0; }
+
+
+/* v13 layout fixes: place toggle beside slider without overlap */
+.level-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.level-row input[type="range"] { flex: 1 1 auto; min-width: 0; }
+.level-picker .level-toggle { position: static !important; right: auto; top: auto; margin-left: 8px; }
+@media (max-width: 640px) {
+  .level-row { flex-wrap: wrap; gap: 8px; }
+  .level-picker .level-toggle { width: fit-content; }
+}
+
+/* Keep the thumb hidden when disabled */
+.level-picker input:disabled::-webkit-slider-thumb { opacity: 0; }
+.level-picker input:disabled::-moz-range-thumb { opacity: 0; }
+.level-picker input:disabled::-ms-thumb { opacity: 0; }
