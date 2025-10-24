@@ -389,3 +389,84 @@ body {
 .level-picker .level:disabled::-webkit-slider-thumb{ width:0; height:0; opacity:0; }
 .level-picker .level:disabled::-moz-range-thumb{ width:0; height:0; opacity:0; }
 .level-picker .level:disabled::-ms-thumb{ width:0; height:0; opacity:0; }
+
+
+/* v23: robust slider styling and alignment */
+.level-picker{
+  display:grid;
+  grid-template-columns: 1fr max-content;
+  grid-template-rows: auto auto;
+  grid-template-areas:
+    "slider toggle"
+    "marks  marks";
+  align-items:center;
+  column-gap:16px;
+}
+
+/* Base slider track */
+.level-picker .level{
+  grid-area: slider;
+  width:100%;
+  min-width:0;
+  margin:0;
+  -webkit-appearance:none;
+  appearance:none;
+  height:10px;
+  background: linear-gradient(90deg, var(--accent) 0 var(--fill), color-mix(in lab, var(--muted), transparent 35%) var(--fill) 100%);
+  border-radius:999px;
+  outline: none;
+}
+
+/* WebKit thumb */
+.level-picker .level::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  appearance:none;
+  width:22px; height:22px; border-radius:50%;
+  background: var(--accent);
+  box-shadow: 0 2px 6px rgba(0,0,0,.25);
+  border: 2px solid color-mix(in lab, white 70%, var(--accent));
+  margin-top: -6px; /* center the thumb on a 10px track: (22-10)/2 */
+  cursor: pointer;
+}
+
+/* Firefox track + thumb */
+.level-picker .level::-moz-range-track{
+  height:10px; border-radius:999px; background:transparent;
+}
+.level-picker .level::-moz-range-progress{
+  height:10px; border-radius:999px; background: var(--accent);
+}
+.level-picker .level::-moz-range-thumb{
+  width:22px; height:22px; border-radius:50%;
+  background: var(--accent);
+  box-shadow: 0 2px 6px rgba(0,0,0,.25);
+  border: 2px solid color-mix(in lab, white 70%, var(--accent));
+  cursor: pointer;
+}
+
+/* Hide thumb + dim track when disabled (All levels ON) */
+.level-picker .level:disabled{
+  --thumb:0px;
+  background: color-mix(in lab, var(--muted), transparent 35%);
+  cursor: not-allowed;
+  opacity: .6;
+}
+.level-picker .level:disabled::-webkit-slider-thumb{ width:0; height:0; border:0; margin:0; box-shadow:none; opacity:0; }
+.level-picker .level:disabled::-moz-range-thumb{ width:0; height:0; border:0; box-shadow:none; opacity:0; }
+
+/* Toggle box alignment to the track center */
+.level-picker .level-toggle{
+  grid-area: toggle;
+  justify-self:end;
+  align-self:center;
+  white-space:nowrap;
+  height:36px;
+}
+
+/* Marks under full width slider */
+.level-picker .marks{
+  grid-area: marks;
+  margin-top:10px;
+  display:grid;
+  grid-template-columns: repeat(6, 1fr);
+}
