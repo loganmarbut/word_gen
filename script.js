@@ -11,6 +11,15 @@ const LEVELS = ["A1","A2","B1","B2","C1","C2"];
 
 let DATA = [];
 
+/* ===== Preferences (favorites & hidden) ===== */
+const LS_FAV = 'wg_favorites';
+const LS_HIDE = 'wg_hidden';
+function loadSet(key){ try { return new Set(JSON.parse(localStorage.getItem(key) || '[]')); } catch { return new Set(); } }
+function saveSet(key, set){ localStorage.setItem(key, JSON.stringify([...set])); }
+let favSet = loadSet(LS_FAV);
+let hideSet = loadSet(LS_HIDE);
+function keyFor(it){ return (it.term || '').toLowerCase(); } // hide by term across topics/levels
+
 /* ===== Elements ===== */
 const list = document.getElementById('list');
 const btn = document.getElementById('btn');
@@ -18,6 +27,8 @@ const levelSlider = document.getElementById('level');
 const themeBtn = document.getElementById('themeToggle');
 const ddRoot = document.getElementById('topicDropdown');
 const anyLevel = document.getElementById('anyLevel');
+const favoritesOnly = document.getElementById('favoritesOnly');
+const resetHiddenBtn = document.getElementById('resetHidden');
 
 /* ===== Theme ===== */
 function applyTheme(theme) {
@@ -176,12 +187,45 @@ function render(items) {
 
     const t = document.createElement('div');
     t.className = 'term';
-    t.textContent = it.term;
+    const title = document.createElement('span');
+    title.textContent = it.term;
     const badges = document.createElement('span');
     badges.className = 'badges';
     if (it.type) { const b1 = document.createElement('span'); b1.className = 'badge'; b1.textContent = it.type; badges.appendChild(b1); }
     if (it.level) { const b2 = document.createElement('span'); b2.className = 'badge'; b2.textContent = it.level; badges.appendChild(b2); }
-    t.appendChild(badges);
+    const left = document.createElement('span'); left.append(title, badges);
+
+    // actions
+    const actions = document.createElement('span');
+    actions.className = 'actions';
+    const favBtn = document.createElement('button');
+    favBtn.className = 'icon-btn fav';
+    favBtn.title = 'Favorite';
+    favBtn.setAttribute('aria-label','Favorite');
+    const k = keyFor(it);
+    const isFav = favSet.has(k);
+    if (isFav) favBtn.classList.add('active');
+    favBtn.textContent = isFav ? '★' : '☆';
+    favBtn.addEventListener('click', () => {
+      if (favSet.has(k)) { favSet.delete(k); } else { favSet.add(k); }
+      saveSet(LS_FAV, favSet);
+      favBtn.classList.toggle('active');
+      favBtn.textContent = favSet.has(k) ? '★' : '☆';
+    });
+
+    const hideBtn = document.createElement('button');
+    hideBtn.className = 'icon-btn hide';
+    hideBtn.title = 'Hide (Known)';
+    hideBtn.setAttribute('aria-label','Hide (Known)');
+    hideBtn.textContent = '🚫';
+    hideBtn.addEventListener('click', () => {
+      hideSet.add(k);
+      saveSet(LS_HIDE, hideSet);
+      card.remove();
+    });
+
+    actions.append(favBtn, hideBtn);
+    t.append(left, actions);
     card.appendChild(t);
 
     const meta = document.createElement('div');
@@ -206,7 +250,11 @@ async function generate() {
   const any = anyLevel.checked;
   const level = LEVELS[Math.max(0, Math.min(LEVELS.length - 1, Number(levelSlider.value) || 0))];
 
-  let pool = DATA;
+  // start with all, exclude hidden, then filter favorites if requested
+  let pool = DATA.filter(x => !hideSet.has(keyFor(x)));
+  if (favoritesOnly && favoritesOnly.checked) {
+    pool = pool.filter(x => favSet.has(keyFor(x)));
+  }
   if (selectedTopic !== 'all') {
     pool = pool.filter(x => x.__topic === selectedTopic);
   }
@@ -230,7 +278,12 @@ async function generate() {
   if (savedLevel !== null) levelSlider.value = String(Math.max(0, Math.min(5, Number(savedLevel))));
   const savedAny = localStorage.getItem('anyLevel');
   if (savedAny !== null) anyLevel.checked = savedAny === '1';
+  const savedFavOnly = localStorage.getItem('favOnly');
+  if (savedFavOnly !== null && favoritesOnly) favoritesOnly.checked = savedFavOnly === '1';
+
   levelSlider.addEventListener('change', () => localStorage.setItem('levelIndex', String(levelSlider.value)));
+  if (favoritesOnly) favoritesOnly.addEventListener('change', () => localStorage.setItem('favOnly', favoritesOnly.checked ? '1' : '0'));
+
   updateSliderVisuals();
   syncAnyLevel();
 })();

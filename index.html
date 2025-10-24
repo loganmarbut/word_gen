@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Word Generator</title>
-  <link rel="stylesheet" href="styles.css?v=39">
+  <link rel="stylesheet" href="styles.css?v=45">
 </head>
 <body>
   <div class="wrap">
@@ -23,13 +23,20 @@
         </label>
 
         <div id="topicDropdown" class="dropdown" data-default="all"></div>
+
+        <label class="toggle" title="Show only favorites">
+          <input id="favoritesOnly" type="checkbox" />
+          <span>★ Favorites only</span>
+        </label>
+
         <button id="btn" class="btn">⚡ Generate</button>
+        <button id="resetHidden" class="btn" title="Unhide all hidden words">↺ Reset hidden</button>
         <button id="themeToggle" class="btn" aria-label="Toggle light/dark theme">🌙 Dark</button>
       </div>
     </div>
 
     <div id="list" class="list" aria-live="polite" aria-busy="false"></div>
   </div>
-  <script src="script.js?v=39"></script>
+  <script src="script.js?v=45"></script>
 </body>
 </html>
