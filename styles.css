@@ -214,3 +214,21 @@ body {
 }
 .meta a { color: var(--muted); text-decoration: none; }
 .meta a:hover { text-decoration: underline; }
+/* --- Any level toggle --- */
+.toggle {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 10px; border-radius: 999px;
+  border: 1px solid var(--ring); background: var(--card);
+  color: var(--muted); box-shadow: var(--shadow-soft); cursor: pointer;
+  user-select: none;
+}
+.toggle input {
+  appearance: none; width: 18px; height: 18px; border-radius: 5px;
+  border: 1px solid var(--ring); display: inline-block; position: relative;
+  background: transparent;
+}
+.toggle input:checked::after {
+  content: ""; position: absolute; inset: 3px; border-radius: 3px;
+  background: var(--accent);
+}
+.level-picker input:disabled { opacity: .5; cursor: not-allowed; }

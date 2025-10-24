@@ -14,8 +14,9 @@ const btn = document.getElementById('btn');
 const levelSlider = document.getElementById('level');
 const themeBtn = document.getElementById('themeToggle');
 const ddRoot = document.getElementById('topicDropdown');
+const anyLevel = document.getElementById('anyLevel');
 
-// ---- Theme handling ----
+// ---- Theme ----
 function applyTheme(theme) {
   document.documentElement.setAttribute('data-theme', theme);
   localStorage.setItem('theme', theme);
@@ -30,20 +31,29 @@ themeBtn?.addEventListener('click', () => {
   applyTheme(current === 'dark' ? 'light' : 'dark');
 });
 
-// ---- Slider fill ----
-function updateSliderVisuals(){
-  const min = Number(levelSlider.min), max = Number(levelSlider.max);
-  const val = Number(levelSlider.value);
-  const pct = (val - min) / (max - min);
-  levelSlider.style.setProperty('--fill', `${pct * 100}%`);
+// ---- Slider fill & accessibility ----
+function updateSliderVisuals() {
+  const min = +levelSlider.min, max = +levelSlider.max, val = +levelSlider.value;
+  const pct = ((val - min) / (max - min)) * 100;
+  levelSlider.style.setProperty('--fill', pct + '%');
+  levelSlider.setAttribute('aria-valuetext', anyLevel?.checked ? 'Any level' : LEVELS[val]);
 }
 levelSlider.addEventListener('input', updateSliderVisuals);
 window.addEventListener('resize', updateSliderVisuals);
 updateSliderVisuals();
 
+function syncAnyLevel() {
+  const any = anyLevel?.checked;
+  if (levelSlider) levelSlider.disabled = !!any;
+  updateSliderVisuals();
+}
+anyLevel?.addEventListener('change', syncAnyLevel);
+syncAnyLevel();
+
 // ---- Custom dropdown (Topic) ----
 const TopicDropdown = (() => {
   const state = { open: false, value: ddRoot?.dataset.default || 'all' };
+
   const trigger = document.createElement('button');
   trigger.type = 'button';
   trigger.className = 'dd-trigger';
@@ -52,157 +62,180 @@ const TopicDropdown = (() => {
 
   const label = document.createElement('span');
   label.textContent = 'All topics';
-  const chev = document.createElementNS('http://www.w3.org/2000/svg','svg');
-  chev.setAttribute('class','chev');
-  chev.setAttribute('width','16'); chev.setAttribute('height','16'); chev.setAttribute('viewBox','0 0 24 24');
-  chev.innerHTML = "<path d='M7 10l5 5 5-5' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/>";
+  const chev = document.createElement('span');
+  chev.className = 'chev';
+  chev.setAttribute('aria-hidden', 'true');
+  chev.textContent = '▾';
   trigger.append(label, chev);
 
   const menu = document.createElement('ul');
   menu.className = 'dd-menu';
-  menu.setAttribute('role','listbox');
-  menu.tabIndex = -1;
+  menu.setAttribute('role', 'listbox');
+  menu.setAttribute('tabindex', '-1');
 
-  function setOpen(v){
-    state.open = v;
-    ddRoot.classList.toggle('open', v);
-    trigger.setAttribute('aria-expanded', String(v));
-    if (v) {
-      menu.style.minWidth = trigger.offsetWidth + 'px';
-      menu.focus();
-    }
-  }
-  function setValue(val, text){
-    state.value = val;
-    label.textContent = text;
-    Array.from(menu.children).forEach(li => li.setAttribute('aria-selected', String(li.dataset.value === val)));
-    setOpen(false);
-  }
-  function buildOptions(){
-    const topics = ['all', ...Array.from(new Set(SOURCES.map(s => s.topic)))];
+  const options = [{value:'all', label:'All topics'}, ...SOURCES.map(s => ({value:s.topic, label:s.topic}))];
+  let highlightIndex = 0;
+
+  function renderOptions() {
     menu.innerHTML = '';
-    topics.forEach(t => {
+    options.forEach((opt, i) => {
       const li = document.createElement('li');
       li.className = 'dd-option';
-      li.setAttribute('role','option');
-      li.dataset.value = t;
-      li.textContent = t === 'all' ? 'All topics' : t;
-      li.setAttribute('aria-selected', String(t === state.value));
-      li.addEventListener('click', () => setValue(t, li.textContent));
+      li.setAttribute('role', 'option');
+      li.setAttribute('data-value', opt.value);
+      li.textContent = opt.label;
+      li.setAttribute('aria-selected', opt.value === state.value ? 'true' : 'false');
+      li.addEventListener('click', () => selectValue(opt.value));
+      li.addEventListener('mousemove', () => { highlightIndex = i; });
       menu.appendChild(li);
     });
   }
-  trigger.addEventListener('click', () => setOpen(!state.open));
-  document.addEventListener('click', (e) => {
-    if (!ddRoot.contains(e.target)) setOpen(false);
+
+  function open() {
+    state.open = true;
+    ddRoot.classList.add('open');
+    trigger.setAttribute('aria-expanded', 'true');
+    renderOptions();
+    // move highlight to current value
+    highlightIndex = Math.max(0, options.findIndex(o => o.value === state.value));
+    setTimeout(() => menu.focus(), 0);
+    document.addEventListener('mousedown', onOutside, { once: true });
+  }
+  function close() {
+    state.open = false;
+    ddRoot.classList.remove('open');
+    trigger.setAttribute('aria-expanded', 'false');
+    trigger.focus();
+  }
+  function onOutside(e) {
+    if (!ddRoot.contains(e.target)) close();
+  }
+  function selectValue(val) {
+    state.value = val;
+    label.textContent = options.find(o => o.value === val)?.label || 'All topics';
+    close();
+  }
+
+  trigger.addEventListener('click', () => state.open ? close() : open());
+  trigger.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault(); open();
+    }
   });
-  ddRoot.append(trigger, menu);
-  buildOptions();
-  setValue(state.value, 'All topics');
-  return { get value(){ return state.value; } };
+
+  menu.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { e.preventDefault(); close(); return; }
+    if (e.key === 'ArrowDown') { e.preventDefault(); highlightIndex = Math.min(options.length-1, highlightIndex+1); focusItem(); }
+    if (e.key === 'ArrowUp')   { e.preventDefault(); highlightIndex = Math.max(0, highlightIndex-1); focusItem(); }
+    if (e.key === 'Enter')     { e.preventDefault(); const opt = options[highlightIndex]; if (opt) selectValue(opt.value); }
+    if (e.key === 'Home')      { e.preventDefault(); highlightIndex = 0; focusItem(); }
+    if (e.key === 'End')       { e.preventDefault(); highlightIndex = options.length-1; focusItem(); }
+  });
+  function focusItem() {
+    const els = [...menu.querySelectorAll('.dd-option')];
+    els[highlightIndex]?.focus?.(); // not tabbable but safe
+  }
+
+  // initial DOM
+  ddRoot?.appendChild(trigger);
+  ddRoot?.appendChild(menu);
+  // initialize label
+  label.textContent = options.find(o => o.value === state.value)?.label || 'All topics';
+
+  return { value: () => state.value };
 })();
 
-// ---- Data + render ----
+// ---- Data loading ----
 async function loadJSON() {
-  if (DATA.length) return DATA;
-  const results = await Promise.all(SOURCES.map(async ({path, topic}) => {
-    try {
-      const res = await fetch(path, { cache: 'no-store' });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const json = await res.json();
-      if (!Array.isArray(json)) throw new Error(`Expected an array in ${path}`);
-      return json.map(x => ({...x, __topic: topic}));
-    } catch (err) {
-      console.error('Failed to load', path, err);
-      return [];
-    }
-  }));
-  const merged = results.flat();
   const map = new Map();
-  for (const item of merged) {
-    if (!item || !item.term) continue;
-    const key = [item.term, item.type || '', item.level || '', item.__topic || ''].join('|').toLowerCase();
-    if (!map.has(key)) map.set(key, item);
+  for (const src of SOURCES) {
+    const res = await fetch(src.path, { cache: 'no-store' });
+    const arr = await res.json();
+    for (const item of arr) {
+      const term = String(item.term || item.word || '').trim();
+      const type = String(item.type || item.pos || '').trim();
+      const level = String(item.level || '').trim();
+      if (!term || !type || !level) continue;
+      const normalized = { term, type, level, __topic: src.topic };
+      const key = `${normalized.term}|${normalized.type}|${normalized.level}|${normalized.__topic}`;
+      if (!map.has(key)) map.set(key, normalized);
+    }
   }
-  DATA = Array.from(map.values());
-  return DATA;
+  DATA = [...map.values()];
 }
 
-function sampleUnique(arr, n) {
-  const copy = arr.slice();
-  for (let i = copy.length - 1; i > 0; i--) {
+// ---- Helpers ----
+function sampleUnique(list, n) {
+  const a = list.slice();
+  for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [copy[i], copy[j]] = [copy[j], copy[i]];
+    [a[i], a[j]] = [a[j], a[i]];
   }
-  return copy.slice(0, n);
+  return a.slice(0, n);
+}
+function dictionaryUrl(term, type) {
+  const base = "https://dictionary.cambridge.org/dictionary/english/";
+  const cleaned = term.replace(/\s+/g,'-').replace(/[^\w\-']/g,'');
+  return base + encodeURIComponent(cleaned);
 }
 
-function dictionaryUrl(term) {
-  const t = encodeURIComponent(String(term || '').replaceAll('…', ''));
-  return `https://dictionary.cambridge.org/dictionary/english/${t}`;
-}
-
+// ---- Render ----
 function render(items) {
   list.innerHTML = '';
-  for (const item of items) {
-    const card = document.createElement('article');
+  for (const it of items) {
+    const card = document.createElement('div');
     card.className = 'card';
 
-    const title = document.createElement('div');
-    title.className = 'term';
-    title.textContent = item.term || '—';
+    const h = document.createElement('div');
+    h.className = 'term';
+    h.textContent = it.term;
 
     const badges = document.createElement('span');
     badges.className = 'badges';
-    if (item.type) {
-      const b1 = document.createElement('span');
-      b1.className = 'badge';
-      b1.textContent = item.type;
-      badges.appendChild(b1);
-    }
-    if (item.level) {
-      const b2 = document.createElement('span');
-      b2.className = 'badge';
-      b2.textContent = item.level;
-      badges.appendChild(b2);
-    }
-    title.appendChild(badges);
-    card.appendChild(title);
+    const bType = document.createElement('span');
+    bType.className = 'badge';
+    bType.textContent = it.type;
+    const bLvl = document.createElement('span');
+    bLvl.className = 'badge';
+    bLvl.textContent = it.level;
+    badges.append(bType, bLvl);
+    h.appendChild(badges);
 
     const meta = document.createElement('div');
     meta.className = 'meta';
-    const link = document.createElement('a');
-    link.href = dictionaryUrl(item.term);
-    link.target = "_blank";
-    link.rel = "noopener";
-    link.textContent = "dictionary ↗";
-    meta.appendChild(link);
-    card.appendChild(meta);
+    const a = document.createElement('a');
+    a.href = dictionaryUrl(it.term, it.type);
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.textContent = 'dictionary ↗';
 
+    meta.appendChild(a);
+
+    card.append(h, meta);
     list.appendChild(card);
   }
 }
 
-function currentLevel() {
-  const idx = Math.max(0, Math.min(LEVELS.length - 1, Number(levelSlider.value) || 0));
-  return LEVELS[idx];
-}
-
-function currentTopic() {
-  const selected = ddRoot.querySelector('.dd-option[aria-selected="true"]');
-  return selected ? selected.dataset.value : 'all';
-}
-
+// ---- Generate ----
 async function generate() {
   list.setAttribute('aria-busy', 'true');
-  await loadJSON();
-  if (!DATA.length) { list.removeAttribute('aria-busy'); return; }
-  const selectedLevel = currentLevel();
-  const selectedTopic = currentTopic();
-  let pool = DATA.filter(x => String(x.level || '').toUpperCase() === selectedLevel);
+
+  if (DATA.length === 0) {
+    await loadJSON();
+  }
+
+  const selectedTopic = TopicDropdown.value();
+  const any = anyLevel?.checked;
+  const level = LEVELS[+levelSlider.value];
+
+  let pool = DATA;
   if (selectedTopic !== 'all') {
     pool = pool.filter(x => x.__topic === selectedTopic);
   }
+  if (!any) {
+    pool = pool.filter(x => x.level === level);
+  }
+
   const five = sampleUnique(pool, Math.min(5, pool.length || 0));
   if (five.length === 0) {
     const alt = DATA.filter(x => selectedTopic === 'all' ? true : x.__topic === selectedTopic);
