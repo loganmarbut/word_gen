@@ -317,3 +317,6 @@ body {
 .level-picker .level:disabled::-webkit-slider-thumb{ width:0; height:0; opacity:0; }
 .level-picker .level:disabled::-moz-range-thumb{ width:0; height:0; opacity:0; }
 .level-picker .level:disabled::-ms-thumb{ width:0; height:0; opacity:0; }
+
+/* v20: space between multiple dictionary links */
+.meta a + a { margin-left: 12px; }

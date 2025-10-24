@@ -215,3 +215,8 @@ async function generate() {
 
 btn.addEventListener('click', generate);
 updateSliderVisuals();
+
+function dikiUrl(term) {
+  const base = "https://www.diki.pl/slownik-angielskiego?q=";
+  return base + encodeURIComponent(term);
+}
