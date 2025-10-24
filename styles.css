@@ -297,3 +297,43 @@ body {
   padding: 10px 12px;     /* internal padding */
   border-radius: 10px;
 }
+
+
+/* v34: polish + fixes */
+:root{ --track-h: 8px; --thumb: 22px; }
+
+.wrap{ padding-top: 64px; padding-bottom: 80px; }
+
+/* Slider centering */
+.level{ height: var(--thumb); }
+.level::-webkit-slider-runnable-track{ height: var(--track-h); }
+.level::-webkit-slider-thumb{
+  width: var(--thumb); height: var(--thumb);
+  margin-top: calc((var(--thumb) - var(--track-h)) / -2);
+}
+.level::-moz-range-track{ height: var(--track-h); }
+.level::-moz-range-progress{ height: var(--track-h); }
+
+/* Flatter controls */
+.btn, .dd-trigger, .toggle{
+  border-radius: 10px; box-shadow: none;
+  border: 1px solid var(--ring); background: var(--card);
+  height: 36px; padding: 0 14px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  font-weight: 600; font-size: 14px; letter-spacing: .2px; line-height: 1;
+}
+.btn:hover, .dd-trigger:hover, .toggle:hover{
+  background: color-mix(in lab, var(--accent) 8%, var(--card));
+}
+
+/* Toggle checkbox */
+.toggle input{ appearance:none; width:18px; height:18px; margin:0; border:1.5px solid var(--ring); border-radius:6px; background:var(--card); position:relative; }
+.toggle input::after{ content:""; position:absolute; inset:3.5px; border-radius:3px; background:transparent; }
+.toggle input:checked::after{ background:var(--accent); }
+
+/* Dropdown cleanup */
+.dd-menu{ list-style:none; padding:6px; margin:8px 0 0 0; }
+.dd-option{ display:block; padding:10px 12px; border-radius:10px; }
+.dd-option:hover, .dd-option[aria-selected="true"]{ background:color-mix(in lab, var(--accent) 14%, transparent); }
+
+.toolbar{ display:flex; gap:12px; justify-content:center; align-items:center; flex-wrap:wrap; margin-top:8px; }
