@@ -36,7 +36,7 @@ function updateSliderVisuals() {
   const min = +levelSlider.min, max = +levelSlider.max, val = +levelSlider.value;
   const pct = ((val - min) / (max - min)) * 100;
   levelSlider.style.setProperty('--fill', pct + '%');
-  levelSlider.setAttribute('aria-valuetext', anyLevel?.checked ? 'Any level' : LEVELS[val]);
+  levelSlider.setAttribute('aria-valuetext', anyLevel?.checked ? 'All levels' : LEVELS[val]);
 }
 levelSlider.addEventListener('input', updateSliderVisuals);
 window.addEventListener('resize', updateSliderVisuals);

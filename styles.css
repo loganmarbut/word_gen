@@ -232,3 +232,25 @@ body {
   background: var(--accent);
 }
 .level-picker input:disabled { opacity: .5; cursor: not-allowed; }
+
+/* v12 */
+
+/* Position the "All levels" toggle next to the level bar */
+.level-picker { position: relative; }
+.level-toggle {
+  position: absolute;
+  right: 0;
+  top: -14px;
+  z-index: 1;
+}
+@media (max-width: 640px) {
+  .level-toggle {
+    position: static;
+    margin-top: 10px;
+  }
+}
+
+/* Hide the slider thumb when disabled (i.e., All levels ON) */
+.level-picker input:disabled::-webkit-slider-thumb { opacity: 0; }
+.level-picker input:disabled::-moz-range-thumb { opacity: 0; }
+.level-picker input:disabled::-ms-thumb { opacity: 0; }
