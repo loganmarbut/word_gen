@@ -320,3 +320,42 @@ body {
 
 /* v20: space between multiple dictionary links */
 .meta a + a { margin-left: 12px; }
+
+
+/* v21: align 'All levels' and unify type */
+.level-picker{
+  grid-template-columns: 1fr max-content;
+  column-gap: 24px; /* a bit more breathing room */
+}
+.level-picker .level{ width:100%; min-width:0; margin:0; } /* remove UA margins */
+.level-picker .level-toggle{
+  justify-self:end;
+  white-space:nowrap;
+  height:36px;
+}
+
+.btn, .dd-trigger, .toggle{
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: .2px;
+}
+
+/* Custom checkbox so alignment matches buttons across platforms */
+.toggle{
+  display:inline-flex; align-items:center; gap:10px; padding:0 14px;
+}
+.toggle input{
+  appearance:none; -webkit-appearance:none; -moz-appearance:none;
+  width:18px; height:18px; border-radius:6px;
+  border:1.5px solid var(--ring);
+  background: var(--card);
+  position:relative; display:inline-block; margin:0;
+}
+.toggle input::after{
+  content:""; position:absolute; inset:3.5px; border-radius:3px;
+  background: transparent;
+}
+.toggle input:checked::after{ background: var(--accent); }
+.toggle input:focus-visible{ outline:none; box-shadow:0 0 0 3px color-mix(in lab, var(--accent) 25%, transparent); border-color: var(--accent); }
+.toggle span{ line-height:1; display:inline-flex; align-items:center; }
