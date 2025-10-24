@@ -179,6 +179,14 @@ function render(items) {
     link.rel = 'noopener noreferrer';
     link.textContent = 'dictionary ↗';
     meta.appendChild(link);
+
+    const link2 = document.createElement('a');
+    link2.href = dikiUrl(it.term);
+    link2.target = '_blank';
+    link2.rel = 'noopener noreferrer';
+    link2.textContent = 'diki.pl ↗';
+    meta.appendChild(link2);
+
     card.appendChild(meta);
 
     list.appendChild(card);
