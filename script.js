@@ -105,29 +105,36 @@ const TopicDropdown = (() => {
   }
   function onOutside(e) { if (!ddRoot.contains(e.target)) close(); }
 
-  trigger.addEventListener('click', () => state.open ? close() : open());
-  ddRoot?.append(trigger, menu);
-  select(state.value); // initialize
+  if (ddRoot) {
+    trigger.addEventListener('click', () => state.open ? close() : open());
+    ddRoot.append(trigger, menu);
+    select(state.value); // initialize
+  }
   return { value: () => state.value };
 })();
 
-/* ===== Data loading (case-insensitive de-dup) ===== */
+/* ===== Data loading (robust + de-dup) ===== */
 async function loadJSON() {
   const map = new Map();
   for (const src of SOURCES) {
-    const res = await fetch(src.path, { cache: 'no-store' });
-    const arr = await res.json();
-    for (const raw of arr) {
-      const term = String(raw.term || raw.word || '').trim();
-      const type = String(raw.type || raw.pos || '').trim();
-      const level = String(raw.level || '').trim();
-      if (!term) continue;
-      const normTerm = term.toLowerCase();
-      const normType = type.toLowerCase();
-      const normLevel = level.toUpperCase();
-      const it = { term, type, level: normLevel, __topic: src.topic };
-      const key = `${normTerm}|${normType}|${normLevel}|${src.topic}`;
-      if (!map.has(key)) map.set(key, it);
+    try {
+      const res = await fetch(src.path, { cache: 'no-store' });
+      if (!res.ok) throw new Error(res.status + ' ' + res.statusText);
+      const arr = await res.json();
+      for (const raw of arr) {
+        const term = String(raw.term || raw.word || '').trim();
+        const type = String(raw.type || raw.pos || '').trim();
+        const level = String(raw.level || '').trim();
+        if (!term) continue;
+        const normTerm = term.toLowerCase();
+        const normType = type.toLowerCase();
+        const normLevel = level.toUpperCase();
+        const it = { term, type, level: normLevel, __topic: src.topic };
+        const key = `${normTerm}|${normType}|${normLevel}|${src.topic}`;
+        if (!map.has(key)) map.set(key, it);
+      }
+    } catch (e) {
+      console.warn('Failed to load', src.path, e);
     }
   }
   DATA = [...map.values()];
@@ -156,6 +163,13 @@ function oxfordUrl(term) {
 /* ===== Render ===== */
 function render(items) {
   list.innerHTML = '';
+  if (!items.length) {
+    const empty = document.createElement('div');
+    empty.className = 'card';
+    empty.textContent = 'No words found for this selection.';
+    list.appendChild(empty);
+    return;
+  }
   for (const it of items) {
     const card = document.createElement('div');
     card.className = 'card';
