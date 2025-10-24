@@ -5,7 +5,7 @@ const SOURCES = [
   { path: "Opinion%20and%20argument.json", topic: "Opinion & Argument" },
   { path: "Doubt,%20guessing%20and%20certainty.json", topic: "Doubt, guessing and certainty" },
   { path: "Discussion%20and%20agreement.json", topic: "Discussion and agreement" },
-  { path: "Character%20and%20personality.json", topic: "Character & Personality" },
+  { path: "Personal%20Qualities.json", topic: "Personal Qualities" },
 ];
 const LEVELS = ["A1","A2","B1","B2","C1","C2"];
 
