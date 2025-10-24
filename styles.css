@@ -281,3 +281,39 @@ body {
 .level-picker .level:disabled::-webkit-slider-thumb{ width:0; height:0; opacity:0; }
 .level-picker .level:disabled::-moz-range-thumb{ width:0; height:0; opacity:0; }
 .level-picker .level:disabled::-ms-thumb{ width:0; height:0; opacity:0; }
+
+
+/* v19: rock-solid layout + alignment */
+.level-picker{
+  display:grid;
+  grid-template-columns: 1fr max-content;
+  grid-template-areas:
+    "slider toggle"
+    "marks  toggle";
+  align-items:center;
+  column-gap:16px;
+}
+.level-picker .level{ grid-area: slider; width:100%; min-width:0; }
+.level-picker .level-toggle{ grid-area: toggle; justify-self:end; white-space:nowrap; }
+
+.level-picker .marks{
+  grid-area: marks;
+  margin-top:10px;
+  display:grid;
+  grid-template-columns: repeat(6, 1fr);
+}
+
+/* Sleeker controls + perfect centering */
+.btn, .dd-trigger, .toggle{
+  display:inline-flex; align-items:center; justify-content:center;
+  gap:8px; height:36px; padding:0 14px; line-height:1;
+  border-radius:12px; border:1px solid var(--ring); background:var(--card);
+  box-shadow:0 1px 2px rgba(0,0,0,.06);
+}
+.btn:hover, .dd-trigger:hover, .toggle:hover{ box-shadow:0 2px 5px rgba(0,0,0,.1); }
+
+/* Hide slider thumb when disabled */
+.level-picker .level:disabled{ --thumb:0px; opacity:.5; cursor:not-allowed; }
+.level-picker .level:disabled::-webkit-slider-thumb{ width:0; height:0; opacity:0; }
+.level-picker .level:disabled::-moz-range-thumb{ width:0; height:0; opacity:0; }
+.level-picker .level:disabled::-ms-thumb{ width:0; height:0; opacity:0; }
