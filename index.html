@@ -1,40 +1,35 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Word Generator</title>
-  <link rel="stylesheet" href="styles.css?v=20">
+  <link rel="stylesheet" href="styles.css?v=34">
 </head>
 <body>
   <div class="wrap">
-    <header class="controls">
-      <div class="slider-row">
-        <div class="slider" id="levelWrap">
-          <input type="range" id="level" min="0" max="5" step="1" value="2" aria-label="Select CEFR level A1 to C2">
-        </div>
+    <div class="controls">
+      <div class="level-picker" role="group" aria-label="CEFR level">
+        <input class="level" id="level" type="range" min="0" max="5" step="1" value="0" aria-label="CEFR level slider" />
         <div class="marks" aria-hidden="true">
           <span>A1</span><span>A2</span><span>B1</span><span>B2</span><span>C1</span><span>C2</span>
         </div>
       </div>
+
       <div class="toolbar">
-        <label class="selectlike">
-          <select id="topic">
-            <option value="all">All topics</option>
-            <option value="Opinion & Argument">Opinion & Argument</option>
-            <option value="Doubt, guessing and certainty">Doubt, guessing and certainty</option>
-            <option value="Discussion and agreement">Discussion and agreement</option>
-          </select>
-          <span class="chev">▾</span>
+        <label class="toggle" title="Ignore the level slider">
+          <input id="anyLevel" type="checkbox" aria-controls="level" />
+          <span>All levels</span>
         </label>
+
+        <div id="topicDropdown" class="dropdown" data-default="all"></div>
         <button id="btn" class="btn">⚡ Generate</button>
         <button id="themeToggle" class="btn" aria-label="Toggle light/dark theme">🌙 Dark</button>
-        <button id="shireToggle" class="btn" aria-label="Toggle Shire theme">🌿 Shire</button>
       </div>
-    </header>
+    </div>
 
-    <main id="list" class="list" aria-live="polite" aria-busy="false"></main>
+    <div id="list" class="list" aria-live="polite" aria-busy="false"></div>
   </div>
-  <script src="script.js?v=20"></script>
+  <script src="script.js?v=34"></script>
 </body>
 </html>
