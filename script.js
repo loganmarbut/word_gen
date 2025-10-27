@@ -17,7 +17,6 @@ let DATA = [];
 const list = document.getElementById('list');
 const btn = document.getElementById('btn');
 const levelSlider = document.getElementById('level');
-const levelBubble = document.getElementById('levelBubble');
 const themeBtn = document.getElementById('themeToggle');
 const ddRoot = document.getElementById('topicDropdown');
 const favToggle = document.getElementById('favToggle');
@@ -116,14 +115,9 @@ function updateSliderUI(){
   const val = Number(levelSlider.value);
   const pct = ((val - min) / (max - min)) * 100;
   levelSlider.style.setProperty('--pos', pct + '%');
-  levelBubble.textContent = currentLevel();
-  // Position bubble
+  // Position bubble (centered on thumb, clamped within rail)
   const railRect = levelSlider.getBoundingClientRect();
-  // handle RTL safe
-  const left = railRect.left + (railRect.width * pct / 100);
-  const parentLeft = levelSlider.parentElement.getBoundingClientRect().left;
-  levelBubble.style.left = (left - parentLeft) + 'px';
-}
+  }
 
 /* Render */
 function render(items){
@@ -151,12 +145,14 @@ function render(items){
     const key = favKey(item);
     const isFav = favs.has(key);
     favBtn.setAttribute('aria-pressed', String(isFav));
-    favBtn.innerHTML = '<span class="star">★</span>';
+    favBtn.innerHTML = `<span class="star">${isFav ? '★' : '☆'}</span>`;
     favBtn.addEventListener('click', () => {
       const set = getFavs();
       if (set.has(key)) set.delete(key); else set.add(key);
       setFavs(set);
-      favBtn.setAttribute('aria-pressed', String(set.has(key)));
+      const on = set.has(key);
+      favBtn.setAttribute('aria-pressed', String(on));
+      favBtn.innerHTML = `<span class="star">${on ? '★' : '☆'}</span>`;
       if (favToggle.getAttribute('aria-pressed') === 'true') generate();
     });
 
