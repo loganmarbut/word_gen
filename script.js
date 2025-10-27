@@ -17,6 +17,7 @@ let DATA = [];
 const list = document.getElementById('list');
 const btn = document.getElementById('btn');
 const levelSlider = document.getElementById('level');
+const levelBubble = document.getElementById('levelBubble');
 const themeBtn = document.getElementById('themeToggle');
 const ddRoot = document.getElementById('topicDropdown');
 const favToggle = document.getElementById('favToggle');
@@ -24,7 +25,7 @@ const favToggle = document.getElementById('favToggle');
 /* Theme */
 function applyTheme(theme){
   document.documentElement.setAttribute('data-theme', theme);
-  themeBtn.innerHTML = (theme === 'dark') ? '<span class="icon">🌞</span> Light' : '<span class="icon">🌙</span> Dark';
+  themeBtn.innerHTML = (theme === 'dark') ? '<span class="icon">🌞</span><span class="label">Light</span>' : '<span class="icon">🌙</span><span class="label">Dark</span>';
 }
 function toggleTheme(){
   const next = (document.documentElement.getAttribute('data-theme') === 'dark') ? 'light' : 'dark';
@@ -108,10 +109,35 @@ function showWarning(msg){
   list.appendChild(div);
 }
 
+/* Slider UI */
+function updateSliderUI(){
+  const max = Number(levelSlider.max);
+  const min = Number(levelSlider.min);
+  const val = Number(levelSlider.value);
+  const pct = ((val - min) / (max - min)) * 100;
+  levelSlider.style.setProperty('--pos', pct + '%');
+  levelBubble.textContent = currentLevel();
+  // Position bubble
+  const railRect = levelSlider.getBoundingClientRect();
+  // handle RTL safe
+  const left = railRect.left + (railRect.width * pct / 100);
+  const parentLeft = levelSlider.parentElement.getBoundingClientRect().left;
+  levelBubble.style.left = (left - parentLeft) + 'px';
+}
+
 /* Render */
 function render(items){
   list.innerHTML = '';
   const favs = getFavs();
+
+  if (!items.length) {
+    const selTopic = currentTopic();
+    const tip = (selTopic === 'all')
+      ? 'No results at this level. Try a different level.'
+      : `No results for <strong>${selTopic}</strong> at this level. Try <em>All topics</em> or another level.`;
+    showWarning(tip);
+    return;
+  }
 
   for (const item of items) {
     const card = document.createElement('article');
@@ -131,7 +157,6 @@ function render(items){
       if (set.has(key)) set.delete(key); else set.add(key);
       setFavs(set);
       favBtn.setAttribute('aria-pressed', String(set.has(key)));
-      // If we're in "favorites only", re-generate so hidden ones disappear
       if (favToggle.getAttribute('aria-pressed') === 'true') generate();
     });
 
@@ -247,10 +272,14 @@ function initDropdown(){
       li.dataset.value = t;
       li.setAttribute('role','option');
       li.setAttribute('aria-selected', String(t === 'all'));
+      li.tabIndex = 0;
       li.textContent = (t === 'all') ? 'All topics' : t;
       li.addEventListener('click', () => {
         setValue(t, li.textContent);
         generate();
+      });
+      li.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { li.click(); }
       });
       menu.appendChild(li);
     });
@@ -260,6 +289,8 @@ function initDropdown(){
   document.addEventListener('click', (e) => {
     if (!ddRoot.contains(e.target)) setOpen(false);
   });
+  window.addEventListener('scroll', () => setOpen(false), { passive:true });
+  window.addEventListener('resize', () => setOpen(false));
 
   ddRoot.append(trigger, menu);
   buildOptions();
@@ -285,9 +316,14 @@ function init(){
   initDropdown();
 
   // Slider
+  updateSliderUI();
+  levelSlider.addEventListener('input', () => { updateSliderUI(); });
   levelSlider.addEventListener('change', generate);
 
-  // First render (empty)
+  // Keyboard: Enter on Generate
+  btn.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ btn.click(); }});
+
+  // First render is empty until user clicks Generate
   list.innerHTML = '';
 }
 

@@ -4,29 +4,34 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Word Generator</title>
-  <link rel="stylesheet" href="styles.css?v=12">
+  <link rel="stylesheet" href="styles.css?v=26">
 </head>
 <body>
+  <a class="skip" href="#list">Skip to results</a>
   <div class="wrap">
-    <div class="rail">
-      <input id="level" type="range" min="0" max="5" step="1" value="0" />
-    </div>
-    <div class="ticks">
-      <span>A1</span><span>A2</span><span>B1</span><span>B2</span><span>C1</span><span>C2</span>
-    </div>
+    <header class="header">
+      <div class="rail">
+        <input id="level" type="range" min="0" max="5" step="1" value="0" aria-label="Level slider A1 to C2" />
+        <div id="levelBubble" class="bubble" role="status" aria-live="polite">A1</div>
+      </div>
+      <div class="ticks" aria-hidden="true">
+        <span>A1</span><span>A2</span><span>B1</span><span>B2</span><span>C1</span><span>C2</span>
+      </div>
+      <nav class="row controls" aria-label="Controls">
+        <div id="topicDropdown"></div>
+        <button id="favToggle" class="btn btn-ghost" aria-pressed="false" title="Show only favorites">
+          <span class="icon">★</span><span class="label">Favorites only</span>
+        </button>
+        <button id="btn" class="btn"><span class="icon">⚡</span><span class="label">Generate</span></button>
+        <button id="themeToggle" class="btn"><span class="icon">🌙</span><span class="label">Dark</span></button>
+      </nav>
+    </header>
 
-    <div class="row controls">
-      <div id="topicDropdown"></div>
-      <button id="favToggle" class="btn btn-ghost" aria-pressed="false" title="Show only favorites">
-        <span class="icon">☆</span> Favorites only
-      </button>
-      <button id="btn" class="btn"><span class="icon">⚡</span> Generate</button>
-      <button id="themeToggle" class="btn"><span class="icon">🌙</span> Dark</button>
-    </div>
-
-    <div id="list" class="cards" aria-live="polite"></div>
+    <main>
+      <section id="list" class="cards" aria-live="polite" aria-label="Word results"></section>
+    </main>
   </div>
 
-  <script src="script.js?v=14" type="module"></script>
+  <script src="script.js?v=26" type="module"></script>
 </body>
 </html>
