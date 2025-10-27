@@ -89,6 +89,15 @@ function oxfordUrl(term){
 }
 
 /* Render */
+
+/* Helper: show a friendly warning if nothing can be loaded (e.g., running from file://) */
+function showWarning(msg){
+  list.innerHTML = "";
+  const div = document.createElement('div');
+  div.className = 'card';
+  div.innerHTML = msg;
+  list.appendChild(div);
+}
 function render(items){
   list.innerHTML = '';
   for (const item of items) {
@@ -137,7 +146,7 @@ function render(items){
 async function generate(){
   list.setAttribute('aria-busy', 'true');
   await loadJSON();
-  if (!DATA.length) { list.innerHTML = ''; list.setAttribute('aria-busy','false'); return; }
+  if (!DATA.length) { const proto = location.protocol; const hint = (proto === 'file:') ? '<strong>Heads up:</strong> Browsers block <code>fetch()</code> from <code>file://</code>. Open this folder with a local server or deploy to GitHub Pages.' : 'No data could be loaded.'; showWarning(hint); list.setAttribute('aria-busy','false'); return; }
 
   const selLevel = currentLevel();
   const selTopic = currentTopic();
