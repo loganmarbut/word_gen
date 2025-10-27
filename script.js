@@ -5,9 +5,10 @@
    Config / Data sources
    ===================== */
 const SOURCES = [
-  { path: "Opinion%20and%20argument.json", topic: "Opinion & Argument" },
-  { path: "Doubt,%20guessing%20and%20certainty.json", topic: "Doubt, guessing and certainty" },
-  { path: "Discussion%20and%20agreement.json", topic: "Discussion and agreement" },
+  { path: "Opinion and argument.json", topic: "Opinion & Argument" },
+  { path: "Doubt, guessing and certainty.json", topic: "Doubt, guessing and certainty" },
+  { path: "Discussion and agreement.json", topic: "Discussion and agreement" },
+  { path: "Personal qualities.json", topic: "Personal Qualities" },
   { path: "Feelings.json", topic: "Feelings" },
 ];
 const LEVELS = ["A1","A2","B1","B2","C1","C2"];
