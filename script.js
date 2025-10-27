@@ -302,14 +302,10 @@ async function loadAll(){
     updateURL(); generate();
   }));
   toggleAny.addEventListener('click', () => {
-    const allOn = currentLevelFilter().length === LEVELS.length;
-    levels.forEach(cb => cb.checked = !allOn);
-    if (allOn) { // if all were on, uncheck all -> interpret as "any" means turn them all ON actually
-      levels.forEach(cb => cb.checked = false); // temporary
-      levels.forEach(cb => cb.checked = true);
-    }
+    // 'Any level' means select ALL levels.
+    levels.forEach(cb => cb.checked = true);
     localStorage.setItem(LS_LEVELS, JSON.stringify(currentLevelFilter()));
-    toggleAny.setAttribute("aria-pressed", String(currentLevelFilter().length === LEVELS.length));
+    toggleAny.setAttribute('aria-pressed', 'true');
     updateURL(); generate();
   });
   topicSelect.addEventListener('change', () => { localStorage.setItem(LS_TOPIC, topicSelect.value); updateURL(); generate(); });
