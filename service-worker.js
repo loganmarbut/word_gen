@@ -5,9 +5,9 @@ const PRECACHE = [
   './index.html',
   './styles.css',
   './script.js',
-  './Opinion%20and%20argument.json',
-  './Doubt,%20guessing%20and%20certainty.json',
-  './Discussion%20and%20agreement.json',
+  './Opinion and argument.json',
+  './Doubt, guessing and certainty.json',
+  './Discussion and agreement.json',
   './Personal%20Qualities.json',
   './Feelings.json'
 ];

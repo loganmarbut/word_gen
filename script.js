@@ -2,10 +2,10 @@
 
 /* ===== Config ===== */
 const SOURCES = [
-  { path: "Opinion%20and%20argument.json", topic: "Opinion & Argument" },
-  { path: "Doubt,%20guessing%20and%20certainty.json", topic: "Doubt, guessing and certainty" },
-  { path: "Discussion%20and%20agreement.json", topic: "Discussion and agreement" },
-  { path: "Personal%20Qualities.json", topic: "Personal Qualities" },
+  { path: "Opinion and argument.json", topic: "Opinion & Argument" },
+  { path: "Doubt, guessing and certainty.json", topic: "Doubt, guessing and certainty" },
+  { path: "Discussion and agreement.json", topic: "Discussion and agreement" },
+  { path: "Personal Qualities.json", topic: "Personal Qualities" },
   { path: "Feelings.json", topic: "Feelings" },
 ];
 const LEVELS = ["A1","A2","B1","B2","C1","C2"];
@@ -186,13 +186,14 @@ const TopicDropdown = (() => {
 
 /* ===== Data loading (robust + de-dup) ===== */
 async function loadJSON() {
+  const errors = []; console.time('loadJSON');
   const map = new Map();
   TOPIC_COUNTS.clear();
   for (const src of SOURCES) {
     try {
       const res = await fetch(src.path); // allow browser caching
       if (!res.ok) throw new Error(res.status + ' ' + res.statusText);
-      const arr = await res.json();
+      const arr = await res.json(); console.log('Loaded', src.path, arr.length, 'rows');
       let topicCount = 0;
       for (const raw of arr) {
         const term = String(raw.term || raw.word || '').trim();
@@ -214,11 +215,25 @@ async function loadJSON() {
       }
       TOPIC_COUNTS.set(src.topic, topicCount);
     } catch (err) {
+      errors.push({file: src.path, err});
       console.warn('Failed to load', src.path, err);
     }
   }
   DATA = [...map.values()];
   TopicDropdown.setCounts?.();
+  console.timeEnd('loadJSON');
+  if (errors.length) {
+    console.warn('Some sources failed:', errors);
+    // Visible helper if everything failed (common when opening via file://)
+    if (DATA.length === 0) {
+      const div = document.createElement('div');
+      div.className = 'empty';
+      div.innerHTML = `<strong>Couldn’t load word lists.</strong><br>
+      If you’re opening this file directly from your disk, browsers block <code>fetch()</code> on <code>file://</code>.
+      <br>Run a local server instead (e.g. <code>python -m http.server</code>) then open <code>http://localhost:8000</code>.`;
+      list.innerHTML = ''; list.appendChild(div);
+    }
+  }
 }
 
 /* ===== Helpers ===== */
