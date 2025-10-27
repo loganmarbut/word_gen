@@ -1,4 +1,3 @@
-
 'use strict';
 
 /* =====================
@@ -20,11 +19,12 @@ const btn = document.getElementById('btn');
 const levelSlider = document.getElementById('level');
 const themeBtn = document.getElementById('themeToggle');
 const ddRoot = document.getElementById('topicDropdown');
+const favToggle = document.getElementById('favToggle');
 
 /* Theme */
 function applyTheme(theme){
   document.documentElement.setAttribute('data-theme', theme);
-  themeBtn.textContent = (theme === 'dark') ? "🌞 Light" : "🌙 Dark";
+  themeBtn.innerHTML = (theme === 'dark') ? '<span class="icon">🌞</span> Light' : '<span class="icon">🌙</span> Dark';
 }
 function toggleTheme(){
   const next = (document.documentElement.getAttribute('data-theme') === 'dark') ? 'light' : 'dark';
@@ -32,7 +32,19 @@ function toggleTheme(){
   applyTheme(next);
 }
 
-/* Fetch + merge data. Never fail the whole app if one file is missing. */
+/* Favorites storage */
+const FAV_KEY = 'wordgen:favorites';
+function favKey(item){
+  return [item.term, item.type||'', item.level||'', item.__topic||''].join('|');
+}
+function getFavs(){
+  try { return new Set(JSON.parse(localStorage.getItem(FAV_KEY)||'[]')); } catch(err){ return new Set(); }
+}
+function setFavs(set){
+  localStorage.setItem(FAV_KEY, JSON.stringify(Array.from(set)));
+}
+
+/* Fetch + merge data (resilient) */
 async function loadJSON(){
   if (DATA.length) return DATA;
   const settled = await Promise.allSettled(
@@ -48,14 +60,13 @@ async function loadJSON(){
   const merged = [];
   for (const s of settled) {
     if (s.status === 'fulfilled' && Array.isArray(s.value)) merged.push(...s.value);
-    // if rejected, ignore; the app should still work with available sets
   }
 
   // Deduplicate
   const map = new Map();
   for (const item of merged) {
     if (!item || !item.term) continue;
-    const key = [item.term, item.type || '', item.level || '', item.__topic || ''].join('|').toLowerCase();
+    const key = favKey(item).toLowerCase();
     if (!map.has(key)) map.set(key, item);
   }
   DATA = Array.from(map.values());
@@ -69,7 +80,7 @@ function sampleUnique(arr, n){
     const j = Math.floor(Math.random() * (i + 1));
     [copy[i], copy[j]] = [copy[j], copy[i]];
   }
-  return copy.slice(0, n);
+  return copy.slice(0, Math.max(0, Math.min(n, copy.length)));
 }
 function currentLevel(){
   const idx = Math.max(0, Math.min(LEVELS.length - 1, Number(levelSlider.value) || 0));
@@ -88,9 +99,7 @@ function oxfordUrl(term){
   return `https://www.oxfordlearnersdictionaries.com/definition/english/${t}`;
 }
 
-/* Render */
-
-/* Helper: show a friendly warning if nothing can be loaded (e.g., running from file://) */
+/* Helper: friendly warning when running from file:// */
 function showWarning(msg){
   list.innerHTML = "";
   const div = document.createElement('div');
@@ -98,27 +107,52 @@ function showWarning(msg){
   div.innerHTML = msg;
   list.appendChild(div);
 }
+
+/* Render */
 function render(items){
   list.innerHTML = '';
+  const favs = getFavs();
+
   for (const item of items) {
     const card = document.createElement('article');
     card.className = 'card';
+
+    // Favorite Star
+    const favBtn = document.createElement('button');
+    favBtn.className = 'fav';
+    favBtn.type = 'button';
+    favBtn.setAttribute('aria-label', 'Toggle favorite');
+    const key = favKey(item);
+    const isFav = favs.has(key);
+    favBtn.setAttribute('aria-pressed', String(isFav));
+    favBtn.innerHTML = '<span class="star">★</span>';
+    favBtn.addEventListener('click', () => {
+      const set = getFavs();
+      if (set.has(key)) set.delete(key); else set.add(key);
+      setFavs(set);
+      favBtn.setAttribute('aria-pressed', String(set.has(key)));
+      // If we're in "favorites only", re-generate so hidden ones disappear
+      if (favToggle.getAttribute('aria-pressed') === 'true') generate();
+    });
 
     const title = document.createElement('div');
     title.className = 'term';
     title.textContent = item.term || '—';
 
+    const rowMeta = document.createElement('div');
+    rowMeta.className = 'row-meta';
+
     const badges = document.createElement('span');
     badges.className = 'badges';
     if (item.type) {
       const b1 = document.createElement('span');
-      b1.className = 'badge';
+      b1.className = 'badge type';
       b1.textContent = item.type;
       badges.appendChild(b1);
     }
     if (item.level) {
       const b2 = document.createElement('span');
-      b2.className = 'badge';
+      b2.className = 'badge level';
       b2.textContent = String(item.level).toUpperCase();
       badges.appendChild(b2);
     }
@@ -137,7 +171,8 @@ function render(items){
 
     meta.append(linkCam, sep, linkOxf);
 
-    card.append(title, badges, meta);
+    rowMeta.append(badges);
+    card.append(favBtn, title, rowMeta, meta);
     list.appendChild(card);
   }
 }
@@ -146,29 +181,35 @@ function render(items){
 async function generate(){
   list.setAttribute('aria-busy', 'true');
   await loadJSON();
-  if (!DATA.length) { const proto = location.protocol; const hint = (proto === 'file:') ? '<strong>Heads up:</strong> Browsers block <code>fetch()</code> from <code>file://</code>. Open this folder with a local server or deploy to GitHub Pages.' : 'No data could be loaded.'; showWarning(hint); list.setAttribute('aria-busy','false'); return; }
+  if (!DATA.length) {
+    const proto = location.protocol;
+    const hint = (proto === 'file:')
+      ? '<strong>Heads up:</strong> Browsers block <code>fetch()</code> from <code>file://</code>. Open with a local server or deploy to GitHub Pages.'
+      : 'No data could be loaded.';
+    showWarning(hint);
+    list.setAttribute('aria-busy','false');
+    return;
+  }
 
   const selLevel = currentLevel();
   const selTopic = currentTopic();
+  const onlyFavs = favToggle.getAttribute('aria-pressed') === 'true';
+  const favs = getFavs();
 
   let pool = DATA.filter(x => String(x.level || '').toUpperCase() === selLevel);
   if (selTopic !== 'all') pool = pool.filter(x => x.__topic === selTopic);
+  if (onlyFavs) pool = pool.filter(x => favs.has(favKey(x)));
 
-  const out = sampleUnique(pool, Math.min(5, pool.length || 0));
-  if (out.length === 0) {
-    const fallback = DATA.filter(x => selTopic === 'all' ? true : x.__topic === selTopic);
-    render(sampleUnique(fallback, Math.min(5, fallback.length)));
-  } else {
-    render(out);
-  }
+  const out = sampleUnique(pool, 5);
+  render(out);
   list.setAttribute('aria-busy', 'false');
 }
 
-/* Simple custom dropdown */
+/* Dropdown */
 function initDropdown(){
   const trigger = document.createElement('button');
   trigger.type = 'button';
-  trigger.className = 'dd-trigger';
+  trigger.className = 'dd-trigger btn';
   trigger.setAttribute('aria-haspopup','listbox');
   trigger.setAttribute('aria-expanded','false');
 
@@ -229,6 +270,16 @@ function init(){
   // Theme
   applyTheme(localStorage.getItem('theme') || 'dark');
   themeBtn.addEventListener('click', toggleTheme);
+
+  // Favorites toggle
+  const favState = localStorage.getItem('wordgen:favOnly') === 'true';
+  favToggle.setAttribute('aria-pressed', String(favState));
+  favToggle.addEventListener('click', () => {
+    const next = favToggle.getAttribute('aria-pressed') !== 'true';
+    favToggle.setAttribute('aria-pressed', String(next));
+    localStorage.setItem('wordgen:favOnly', String(next));
+    generate();
+  });
 
   // Dropdown
   initDropdown();
