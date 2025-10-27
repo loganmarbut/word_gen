@@ -3,40 +3,69 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Word Generator</title>
-  <link rel="stylesheet" href="styles.css?v=44">
+  <title>Word Generator — Improved</title>
+  <meta name="description" content="Generate CEFR-aligned vocabulary by topic and level. Favorite, hide, quiz, and export sets for study." />
+  <meta property="og:title" content="Word Generator" />
+  <meta property="og:description" content="Generate CEFR-aligned vocabulary by topic and level. Favorite, hide, quiz, and export sets for study." />
+  <meta property="og:type" content="website" />
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="wrap">
     <div class="controls">
       <div class="level-picker" role="group" aria-label="CEFR level">
-        <input class="level" id="level" type="range" min="0" max="5" step="1" value="0" aria-label="CEFR level slider" />
+        <div class="level-row">
+          <label for="level" class="sr-only">Level</label>
+          <input class="level" id="level" type="range" min="0" max="5" step="1" value="0" aria-label="CEFR level slider" />
+          <span id="levelText" class="level-text" aria-live="polite">A1</span>
+        </div>
         <div class="marks" aria-hidden="true">
           <span>A1</span><span>A2</span><span>B1</span><span>B2</span><span>C1</span><span>C2</span>
         </div>
       </div>
 
+      <div id="topicDropdown" class="dropdown" data-default="all" aria-label="Topic"></div>
+
       <div class="toolbar">
         <label class="toggle" title="Ignore the level slider">
-          <input id="anyLevel" type="checkbox" aria-controls="level" />
-          <span>All levels</span>
+          <input id="anyLevel" type="checkbox" role="switch" aria-label="Any level" />
+          <span>Any level</span>
         </label>
 
-        <div id="topicDropdown" class="dropdown" data-default="all"></div>
-
-        <label class="toggle" title="Show only favorites">
-          <input id="favoritesOnly" type="checkbox" />
+        <label class="toggle" title="Only show your favorites">
+          <input id="favoritesOnly" type="checkbox" role="switch" aria-label="Favorites only" />
           <span>★ Favorites only</span>
         </label>
 
+        <label class="toggle" title="How many words to pick">
+          <span>Pick</span>
+          <select id="batch" aria-label="How many words">
+            <option value="3">3</option>
+            <option value="5" selected>5</option>
+            <option value="10">10</option>
+          </select>
+        </label>
+
         <button id="btn" class="btn">⚡ Generate</button>
+        <button id="copyBtn" class="btn" title="Copy the current set">📋 Copy set</button>
+        <button id="exportFavBtn" class="btn" title="Export favorites as CSV">⬇️ Export favorites</button>
         <button id="resetHidden" class="btn" title="Unhide all hidden words">↺ Reset hidden</button>
         <button id="themeToggle" class="btn" aria-label="Toggle light/dark theme">🌙 Dark</button>
       </div>
+
+      <div id="summary" class="summary" aria-live="polite"></div>
     </div>
 
     <div id="list" class="list" aria-live="polite" aria-busy="false"></div>
   </div>
-  <script src="script.js?v=44"></script>
+
+  <script src="script.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
+    }
+  </script>
 </body>
 </html>
