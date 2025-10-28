@@ -118,6 +118,14 @@ function renderList(items){
 
     const h3 = document.createElement('h3');
     h3.textContent = it.term;
+    // Make the term behave like a link without changing CSS
+    h3.setAttribute('role','link');
+    h3.tabIndex = 0;
+    h3.title = 'Open Oxford definition in a new tab';
+    const dictUrl = 'https://www.oxfordlearnersdictionaries.com/search/english/?q=' + encodeURIComponent(it.term);
+    const openDict = () => window.open(dictUrl, '_blank', 'noopener');
+    h3.addEventListener('click', openDict);
+    h3.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDict(); } });
     card.appendChild(h3);
 
     const meta = document.createElement('div');

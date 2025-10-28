@@ -1,5 +1,5 @@
 /* Simple offline cache */
-const VERSION = 'v3';
+const VERSION = 'v4';
 const APP_ASSETS = [
   './',
   './index.html',
