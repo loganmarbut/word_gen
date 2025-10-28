@@ -118,7 +118,7 @@ function renderList(items){
 
     const h3 = document.createElement('h3');
     h3.textContent = it.term;
-    // Make the term behave like a link without changing CSS
+    // Link-like behavior
     h3.setAttribute('role','link');
     h3.tabIndex = 0;
     h3.title = 'Open Oxford definition in a new tab';
