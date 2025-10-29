@@ -21,10 +21,8 @@ output{min-width:2ch;display:inline-block;text-align:right}
 .list{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
 .card{background:var(--panel);padding:14px;border-radius:14px;box-shadow:0 0 0 1px var(--ring) inset}
 .card h3{margin:0 0 6px 0;font-size:18px}
-/* Make term headers feel link-like without changing overall look */
 .card h3[role="link"]{cursor:pointer}
-.card h3[role="link"]:hover,
-.card h3[role="link"]:focus{ text-decoration: underline; text-underline-offset: 2px }
+.card h3[role="link"]:hover, .card h3[role="link"]:focus{ text-decoration: underline; text-underline-offset: 2px }
 .meta{color:var(--muted);font-size:13px;margin-bottom:10px}
 .actions{display:flex;gap:6px;flex-wrap:wrap}
 .actions .icon-btn{padding:6px 8px;border-radius:10px;border:1px solid var(--ring);background:#0d1116;cursor:pointer}

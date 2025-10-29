@@ -1,5 +1,5 @@
 /* Simple offline cache */
-const VERSION = 'v5';
+const VERSION = 'v6';
 const APP_ASSETS = [
   './',
   './index.html',
@@ -7,6 +7,7 @@ const APP_ASSETS = [
   './script.js',
   './manifest.webmanifest',
   // data
+  './Kitchen equipment.json',
   './Opinion and argument.json',
   './Doubt, guessing and certainty.json',
   './Discussion and agreement.json',
